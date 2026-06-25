@@ -112,7 +112,7 @@ export default function Home() {
             <div className="flex items-center justify-center gap-6 text-sm text-gray-400 mb-12">
               <span className="flex items-center gap-1.5"><Calendar size={15} className="text-primary" /> 09 de Julho de 2026</span>
               <span className="w-1 h-1 rounded-full bg-gray-600" />
-              <span className="flex items-center gap-1.5"><MapPin size={15} className="text-primary" /> Campus Norte FMUSP, São Paulo</span>
+              <span className="flex items-center gap-1.5"><MapPin size={15} className="text-primary" /> UnDF Jorge Amaury, Brasília — DF</span>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
@@ -307,7 +307,7 @@ export default function Home() {
 
                   <p className="text-gray-300 text-sm max-w-md mx-auto leading-relaxed mb-6">
                     participou do <strong className="text-white">Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</strong>,
-                    realizado em 09 de julho de 2026, Campus Norte FMUSP, São Paulo — SP,
+                    realizado em 09 de julho de 2026, Universidade do Distrito Federal Jorge Amaury, Lago Norte, Brasília — DF,
                     com carga horária de <strong className="text-white">10 (dez) horas</strong>.
                   </p>
 
@@ -317,7 +317,7 @@ export default function Home() {
                     <div className="text-center">
                       <div className="w-32 h-px bg-gray-500 mx-auto mb-2" />
                       <p className="text-white text-sm font-medium">Prof. Dr. Carlos Augusto Silva</p>
-                      <p className="text-gray-500 text-xs">Coordenador — FMUSP</p>
+                      <p className="text-gray-500 text-xs">Coordenador — UnDF</p>
                     </div>
                     <div className="text-center">
                       <div className="w-32 h-px bg-gray-500 mx-auto mb-2" />
@@ -365,7 +365,7 @@ export default function Home() {
           <Accordion type="single" collapsible className="w-full space-y-3">
             {[
               { q: "O evento é gratuito?", a: "Sim. A inscrição é totalmente gratuita. As vagas são limitadas, então garanta a sua o quanto antes." },
-              { q: "Onde será realizado o evento?", a: "O Conecta Orto 2026 acontece no Campus Norte da FMUSP (Faculdade de Medicina da USP), Av. Dr. Arnaldo, 455 – São Paulo, SP. Há estacionamento no local e acesso fácil pela Estação Consolação do Metrô." },
+              { q: "Onde será realizado o evento?", a: "O Conecta Orto 2026 acontece na Universidade do Distrito Federal Jorge Amaury (UnDF), SHIN CA 2 – Lago Norte, Brasília – DF, CEP 71503-502. Há estacionamento no local." },
               { q: "O certificado tem validade para horas complementares?", a: "Sim. Todos os participantes recebem um certificado de 10 horas que pode ser utilizado como horas complementares em diversas instituições de ensino." },
               { q: "Posso me inscrever em mais de um minicurso?", a: "Não. Como os minicursos ocorrem em paralelo durante a tarde, você poderá participar de apenas um. Escolha com atenção ao se inscrever." },
               { q: "O almoço está incluso?", a: "A inscrição inclui acesso a todas as atividades e coffee breaks (manhã e tarde). O almoço é por conta do congressista — haverá praça de alimentação próxima ao Campus." },

@@ -145,7 +145,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </li>
                 <li className="flex items-start gap-3">
                   <MapPin className="h-4 w-4 mt-1 flex-shrink-0" />
-                  Av. Dr. Arnaldo, 455 – São Paulo, SP
+                  SHIN CA 2 – Lago Norte, Brasília – DF
                 </li>
               </ul>
             </div>
@@ -153,7 +153,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           
           <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
             <p>&copy; {new Date().getFullYear()} Conecta Orto. Todos os direitos reservados.</p>
-            <p>Evento realizado com apoio da FMUSP</p>
+            <p>Evento realizado na Universidade do Distrito Federal Jorge Amaury</p>
           </div>
         </div>
       </footer>

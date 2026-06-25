@@ -52,7 +52,7 @@ function CertificateCard({
 
           <p className="text-gray-300 text-sm max-w-sm mx-auto leading-relaxed mb-4">
             {isPrimary
-              ? <>participou do <strong className="text-white">Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</strong>, realizado em 09 de julho de 2026, Campus Norte FMUSP, São Paulo — SP, com carga horária de <strong className="text-white">{hours}</strong>.</>
+              ? <>participou do <strong className="text-white">Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</strong>, realizado em 09 de julho de 2026, Universidade do Distrito Federal Jorge Amaury, Lago Norte, Brasília — DF, com carga horária de <strong className="text-white">{hours}</strong>.</>
               : <>concluiu o minicurso <strong className="text-white">"{title}"</strong>{instructor ? <>, ministrado por <strong className="text-white">{instructor}</strong></> : null}, com carga horária de <strong className="text-white">{hours}</strong>.</>
             }
           </p>
@@ -62,7 +62,7 @@ function CertificateCard({
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-2 text-xs text-gray-500">
             <span className="flex items-center gap-1"><Calendar size={11} /> 09 de Julho de 2026</span>
             <span className="hidden sm:block w-1 h-1 rounded-full bg-gray-600" />
-            <span className="flex items-center gap-1"><MapPin size={11} /> Campus Norte FMUSP, São Paulo</span>
+            <span className="flex items-center gap-1"><MapPin size={11} /> UnDF Jorge Amaury, Brasília — DF</span>
           </div>
         </div>
       </div>

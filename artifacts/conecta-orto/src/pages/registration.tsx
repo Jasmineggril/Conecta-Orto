@@ -155,7 +155,7 @@ export default function Registration() {
                         <FormItem>
                           <FormLabel className="text-gray-300">Cidade / Estado</FormLabel>
                           <FormControl>
-                            <Input placeholder="São Paulo, SP" className="bg-black/20 border-white/10 text-white placeholder:text-gray-600 focus-visible:ring-primary" {...field} />
+                            <Input placeholder="Brasília, DF" className="bg-black/20 border-white/10 text-white placeholder:text-gray-600 focus-visible:ring-primary" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

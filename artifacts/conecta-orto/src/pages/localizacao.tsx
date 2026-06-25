@@ -33,7 +33,7 @@ export default function Localizacao() {
         >
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Conheça o Local do Evento</h1>
           <p className="text-xl text-gray-400">
-            Campus Norte FMUSP – Av. Dr. Arnaldo, 455, São Paulo, SP
+            Universidade do Distrito Federal Jorge Amaury – SHIN CA 2, Lago Norte, Brasília – DF
           </p>
         </motion.div>
 
@@ -97,7 +97,7 @@ export default function Localizacao() {
           
           <div className="glass-panel p-2 rounded-2xl mb-8 overflow-hidden">
             <iframe
-              src="https://maps.google.com/maps?q=Av.+Dr.+Arnaldo,+455,+São+Paulo,+SP&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              src="https://maps.google.com/maps?q=SHIN+CA+2,+Lago+Norte,+Bras%C3%ADlia,+DF,+71503-502&t=&z=16&ie=UTF8&iwloc=&output=embed"
               className="w-full h-[450px] rounded-xl border-0"
               loading="lazy"
               allowFullScreen
