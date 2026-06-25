@@ -1,0 +1,137 @@
+Unidade Curricular Engenharia de Software: Extensão curricularizada 2 
+
+Profº Silvio Gobbi 
+
+Descrição da Atividade: Projeto de Extensão “Por Dentro do Corpo, Sem Medo 
+
+do Implante: entenda a tecnologia, perca o receio conhecendo a engenharia a 
+
+serviço da comunidade”. 
+
+1. O Desafio (O Problema) 
+
+Muitas pessoas na comunidade convivem com implantes ortopédicos (pinos, placas, 
+
+próteses) ou enfrentarão essa realidade no futuro, mas o desconhecimento gera 
+
+medo e insegurança. Como acadêmicos de Engenharia de Software, o desafio de 
+
+vocês é criar um Aplicativo Web (Website interativo) que democratize esse 
+
+conhecimento técnico, transformando a complexidade da engenharia em confiança 
+
+para a comunidade.  
+
+2. O Objetivo 
+
+Desenvolver a identidade digital por meio de um Aplicativo Web (Website interativo) 
+
+para um Congresso de Extensão voltado à comunidade. Este evento terá como foco 
+
+desmistificar o uso de materiais no corpo humano, explicar a tecnologia e a segurança 
+
+por trás dos implantes ortopédicos e acolher o público que possui receio ou dúvidas 
+
+sobre esses procedimentos. 
+
+3. Etapas do Trabalho 
+
+● Fase 1:  
+
+Identidade: A primeira tarefa do grupo será definir o Nome do Congresso. O nome 
+
+deve ser inclusivo, passar credibilidade técnica e, ao mesmo tempo, despertar a 
+
+curiosidade e atender à necessidade da comunidade de conhecer a fundo a 
+
+engenharia e o funcionamento dos implantes ortopédicos. 
+
+Programação: Definir a agenda de 1 dia inteiro de evento, incluindo horários de 
+
+início e término, palestras, oficinas e minicursos. 
+
+● Fase 2: Desenvolvimento do Aplicativo Web (Website interativo) 
+
+O Aplicativo Web deverá ser um site informativo com funcionalidades básicas, 
+
+utilizando Banco de Dados. 
+
+1. Página Inicial (Home) 
+
+A página inicial deverá conter: 
+
+● Vídeo do evento (incorporado – YouTube, por exemplo) 
+
+● Apresentação do congresso (texto explicativo acessível à comunidade) 
+
+Botões principais: 
+
+● Inscrever-se no Evento 
+
+● Minicursos 
+
+● Certificados 
+
+2. Inscrição no Evento 
+
+Ao clicar em “Inscrever-se no Evento”, o sistema deverá apresentar: - Formulário com: 
+
+● Nome 
+
+● E-mail 
+
+● Telefone… 
+
+⚙️ Funcionalidades: 
+
+● Armazenar os dados no Banco de Dados 
+
+● Contar automaticamente o número de inscritos 
+
+3. Minicursos 
+
+Ao clicar em “Minicursos”, o sistema deverá apresentar (Para se inscrever em 
+
+minicursos, o usuário deverá previamente estar inscrito no evento):  
+
+Lista de cursos (2 minicursos): 
+
+Exemplo: 
+
+● Minicurso 1: Introdução aos Implantes 
+
+● Minicurso 2: Materiais Biocompatíveis 
+
+Cada minicurso deve conter: 
+
+● Nome do curso 
+
+● Botão “Inscrever-se” 
+
+⚙️ Funcionalidade: 
+
+● Registrar no banco de dados: 
+
+○ Qual usuário se inscreveu em qual minicurso 
+
+4. Certificados 
+
+Ao clicar em “Certificados”, o sistema deverá permitir: 
+
+�
+
+� Busca por: 
+
+● E-mail do participante 
+
+�
+
+� Exibir: 
+
+● Certificado de participação no evento 
+
+● Certificados dos minicursos (caso inscrito) 
+
+Os certificados podem ser apresentados de forma simples na tela (não 
+
+sendo obrigatória a geração de PDF)
