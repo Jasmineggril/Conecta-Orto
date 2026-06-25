@@ -3,20 +3,27 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: API specification for Conecta Orto
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: registrations
+    description: Event registrations
+  - name: minicourses
+    description: Minicourse management
+  - name: enrollments
+    description: Minicourse enrollments
+  - name: admin
+    description: Admin operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +31,379 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /registrations:
+    post:
+      operationId: createRegistration
+      tags: [registrations]
+      summary: Register for the event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registration"
+        "409":
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    get:
+      operationId: getRegistrations
+      tags: [registrations]
+      summary: Get registration count
+      responses:
+        "200":
+          description: Registration count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegistrationCount"
+
+  /registrations/lookup:
+    post:
+      operationId: lookupRegistration
+      tags: [registrations]
+      summary: Look up registration by email (for certificate)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailLookup"
+      responses:
+        "200":
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegistrationWithEnrollments"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /minicourses:
+    get:
+      operationId: getMinicourses
+      tags: [minicourses]
+      summary: List all minicourses with enrollment counts
+      responses:
+        "200":
+          description: List of minicourses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MinicourseWithCount"
+
+  /enrollments:
+    post:
+      operationId: createEnrollment
+      tags: [enrollments]
+      summary: Enroll in a minicourse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnrollmentInput"
+      responses:
+        "201":
+          description: Enrolled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Enrollment"
+        "409":
+          description: Already enrolled or course full
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginInput"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminToken"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /admin/registrants:
+    get:
+      operationId: getAdminRegistrants
+      tags: [admin]
+      summary: Get all registrants with their enrollments (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: All registrants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RegistrantWithEnrollments"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Get admin dashboard stats
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     HealthStatus:
       type: object
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    RegistrationInput:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        city:
+          type: string
+        profession:
+          type: string
+      required: [name, email, phone, city, profession]
+
+    EmailLookup:
+      type: object
+      properties:
+        email:
+          type: string
+      required: [email]
+
+    Registration:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        city:
+          type: string
+        profession:
+          type: string
+        createdAt:
+          type: string
+      required: [id, name, email, phone, city, profession, createdAt]
+
+    RegistrationCount:
+      type: object
+      properties:
+        count:
+          type: integer
+      required: [count]
+
+    RegistrationWithEnrollments:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        city:
+          type: string
+        profession:
+          type: string
+        createdAt:
+          type: string
+        enrollments:
+          type: array
+          items:
+            $ref: "#/components/schemas/EnrolledMinicourse"
+      required: [id, name, email, phone, city, profession, createdAt, enrollments]
+
+    EnrolledMinicourse:
+      type: object
+      properties:
+        minicourseId:
+          type: integer
+        title:
+          type: string
+        instructor:
+          type: string
+      required: [minicourseId, title, instructor]
+
+    MinicourseWithCount:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        instructor:
+          type: string
+        description:
+          type: string
+        duration:
+          type: string
+        maxCapacity:
+          type: integer
+        enrollmentCount:
+          type: integer
+      required: [id, title, instructor, description, duration, maxCapacity, enrollmentCount]
+
+    EnrollmentInput:
+      type: object
+      properties:
+        registrationId:
+          type: integer
+        minicourseId:
+          type: integer
+      required: [registrationId, minicourseId]
+
+    Enrollment:
+      type: object
+      properties:
+        id:
+          type: integer
+        registrationId:
+          type: integer
+        minicourseId:
+          type: integer
+        createdAt:
+          type: string
+      required: [id, registrationId, minicourseId, createdAt]
+
+    AdminLoginInput:
+      type: object
+      properties:
+        password:
+          type: string
+      required: [password]
+
+    AdminToken:
+      type: object
+      properties:
+        token:
+          type: string
+      required: [token]
+
+    RegistrantWithEnrollments:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        city:
+          type: string
+        profession:
+          type: string
+        createdAt:
+          type: string
+        minicourses:
+          type: array
+          items:
+            type: string
+      required: [id, name, email, phone, city, profession, createdAt, minicourses]
+
+    AdminStats:
+      type: object
+      properties:
+        totalRegistrants:
+          type: integer
+        minicourseEnrollments:
+          type: array
+          items:
+            $ref: "#/components/schemas/MinicourseEnrollmentStat"
+      required: [totalRegistrants, minicourseEnrollments]
+
+    MinicourseEnrollmentStat:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        enrollmentCount:
+          type: integer
+        maxCapacity:
+          type: integer
+      required: [id, title, enrollmentCount, maxCapacity]
