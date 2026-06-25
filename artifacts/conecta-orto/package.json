@@ -73,5 +73,9 @@
     "vite": "catalog:",
     "wouter": "^3.3.5",
     "zod": "catalog:"
+  },
+  "dependencies": {
+    "react-zoom-pan-pinch": "^4.0.3",
+    "yet-another-react-lightbox": "^3.32.0"
   }
 }

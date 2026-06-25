@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Instagram, Linkedin, Youtube, MapPin, Mail, Phone } from "lucide-react";
 import logo from "@assets/image_1782408441192.png";
 import { Button } from "@/components/ui/button";
 
@@ -22,6 +22,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { href: "/inscricao", label: "Inscrição" },
     { href: "/minicursos", label: "Minicursos" },
     { href: "/certificados", label: "Certificados" },
+    { href: "/localizacao", label: "Local" },
+    { href: "/palestrantes", label: "Palestrantes" },
+    { href: "/galeria", label: "Galeria" },
   ];
 
   return (
@@ -91,12 +94,67 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       <main className="flex-grow pt-20">{children}</main>
 
-      <footer className="glass-panel mt-auto py-8 border-t-0 border-b-0 border-x-0 border-t border-white/10">
-        <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <img src={logo} alt="Conecta Orto" className="h-8 opacity-50 grayscale" />
-          <p className="text-gray-400 text-sm text-center md:text-left">
-            &copy; {new Date().getFullYear()} Conecta Orto. Todos os direitos reservados.
-          </p>
+      <footer className="glass-panel mt-auto py-12 border-t border-white/10 text-gray-400">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div className="flex flex-col gap-4">
+              <img src={logo} alt="Conecta Orto" className="h-10 w-fit" />
+              <p className="text-sm">O Futuro dos Implantes Ortopédicos</p>
+              <div className="flex gap-4 mt-2">
+                <Button variant="ghost" size="icon" className="rounded-full hover:text-primary hover:bg-white/5">
+                  <Instagram className="h-5 w-5" />
+                </Button>
+                <Button variant="ghost" size="icon" className="rounded-full hover:text-primary hover:bg-white/5">
+                  <Linkedin className="h-5 w-5" />
+                </Button>
+                <Button variant="ghost" size="icon" className="rounded-full hover:text-primary hover:bg-white/5">
+                  <Youtube className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              <h4 className="text-white font-semibold">Mapa do Site</h4>
+              <ul className="space-y-2 text-sm flex flex-col">
+                {navLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="hover:text-primary transition-colors">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <Link href="/admin" className="hover:text-primary transition-colors">
+                    Admin
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <h4 className="text-white font-semibold">Contato</h4>
+              <ul className="space-y-3 text-sm">
+                <li className="flex items-center gap-3">
+                  <Mail className="h-4 w-4" /> contato@conectaorto.com.br
+                </li>
+                <li className="flex items-center gap-3">
+                  <Phone className="h-4 w-4" /> (11) 3061-7000
+                </li>
+                <li className="flex items-center gap-3">
+                  <Instagram className="h-4 w-4" /> @conectaorto
+                </li>
+                <li className="flex items-start gap-3">
+                  <MapPin className="h-4 w-4 mt-1 flex-shrink-0" />
+                  Av. Dr. Arnaldo, 455 – São Paulo, SP
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+            <p>&copy; {new Date().getFullYear()} Conecta Orto. Todos os direitos reservados.</p>
+            <p>Evento realizado com apoio da FMUSP</p>
+          </div>
         </div>
       </footer>
     </div>

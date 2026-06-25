@@ -1,0 +1,245 @@
+Quero transformar este projeto em um site profissional e moderno para o congresso "Conecta Orto – O Futuro dos Implantes Ortopédicos".
+
+NÃO remova nenhuma funcionalidade existente.
+
+Mantenha:
+- Home
+- Inscrição
+- Minicursos
+- Certificados
+- Banco de dados PostgreSQL
+- Dashboard Admin
+
+Agora adicione as seguintes melhorias:
+
+=========================
+1. NOVA HOME
+=========================
+
+Criar um Hero semelhante aos grandes eventos.
+
+Adicionar:
+
+- Banner em tela cheia
+- Background com animação suave
+- Contagem regressiva para o evento
+- Botão "Inscreva-se"
+- Botão "Programação"
+- Botão "Como chegar"
+
+Adicionar uma seção com números:
+
+✓ +300 participantes
+✓ 8 palestras
+✓ 2 minicursos
+✓ Certificado de participação
+
+=========================
+2. PLANTA BAIXA
+=========================
+
+Criar uma página chamada:
+
+/localizacao
+
+Adicionar:
+
+Título:
+"Conheça o local do evento"
+
+Subtítulo:
+"Navegue pelo Campus Norte antes mesmo de chegar."
+
+Inserir a planta baixa enviada.
+
+Criar zoom.
+
+Permitir ampliar a imagem.
+
+Criar marcadores coloridos indicando:
+
+📍 Auditório
+📍 Recepção
+📍 Banheiros
+📍 Laboratórios
+📍 Salas dos minicursos
+📍 Entrada Principal
+📍 Estacionamento
+
+Quando clicar em cada marcador abrir um pequeno card explicando aquele local.
+
+=========================
+3. MAPA
+=========================
+
+Adicionar Google Maps incorporado.
+
+Mostrar:
+
+Campus Norte
+
+Adicionar botão:
+
+"Como chegar"
+
+=========================
+4. CRONOGRAMA
+=========================
+
+Transformar a programação em Timeline bonita.
+
+08:00 Credenciamento
+
+09:00 Abertura
+
+10:00 Palestra
+
+12:00 Almoço
+
+14:00 Minicursos
+
+17:00 Encerramento
+
+Usar cartões modernos.
+
+=========================
+5. PALESTRANTES
+=========================
+
+Criar página:
+
+/palestrantes
+
+Adicionar cards com foto circular.
+
+Nome
+
+Cargo
+
+Mini biografia
+
+LinkedIn
+
+=========================
+6. GALERIA
+=========================
+
+Criar galeria de fotos.
+
+Grid responsivo.
+
+Abrir em Lightbox.
+
+=========================
+7. FAQ
+=========================
+
+Adicionar perguntas frequentes em Accordion.
+
+=========================
+8. PATROCINADORES
+=========================
+
+Criar seção para logos.
+
+=========================
+9. DESIGN
+=========================
+
+Usar visual moderno inspirado em:
+
+CCXP
+
+Campus Party
+
+AWS Summit
+
+Google I/O
+
+Utilizar:
+
+Glassmorphism
+
+Gradientes
+
+Cards elevados
+
+Hover
+
+Animações suaves
+
+Scroll Reveal
+
+=========================
+10. ACESSIBILIDADE
+=========================
+
+Modo escuro
+
+Fonte maior
+
+Alto contraste
+
+=========================
+11. RODAPÉ
+=========================
+
+Adicionar:
+
+Contato
+
+Email
+
+Telefone
+
+Instagram
+
+LinkedIn
+
+Mapa do site
+
+=========================
+12. RESPONSIVIDADE
+=========================
+
+Funcionar perfeitamente em:
+
+Desktop
+
+Tablet
+
+Celular
+
+=========================
+13. PERFORMANCE
+=========================
+
+Lazy Loading
+
+Compressão de imagens
+
+Skeleton Loading
+
+=========================
+14. ANIMAÇÕES
+=========================
+
+Usar Framer Motion.
+
+Fade
+
+Slide
+
+Scale
+
+=========================
+15. FINAL
+=========================
+
+Corrigir qualquer erro existente.
+
+Não remover nenhuma funcionalidade.
+
+Atualizar todo o projeto.
+
+Deixar com aparência de um evento profissional.

@@ -10,6 +10,9 @@ import Registration from "@/pages/registration";
 import Minicourses from "@/pages/minicourses";
 import Certificates from "@/pages/certificates";
 import AdminDashboard from "@/pages/admin";
+import Localizacao from "@/pages/localizacao";
+import Palestrantes from "@/pages/palestrantes";
+import Galeria from "@/pages/galeria";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +25,9 @@ function Router() {
         <Route path="/minicursos" component={Minicourses} />
         <Route path="/certificados" component={Certificates} />
         <Route path="/admin" component={AdminDashboard} />
+        <Route path="/localizacao" component={Localizacao} />
+        <Route path="/palestrantes" component={Palestrantes} />
+        <Route path="/galeria" component={Galeria} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

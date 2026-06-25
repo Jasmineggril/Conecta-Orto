@@ -69,7 +69,7 @@ export default function Home() {
               Conectando profissionais, tecnologia e inovação no maior congresso de implantes ortopédicos do país.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 flex-wrap">
               <Link href="/inscricao">
                 <Button size="lg" className="w-full sm:w-auto text-lg px-8 py-6 h-auto">
                   Garantir minha vaga <ArrowRight className="ml-2" />
@@ -78,6 +78,16 @@ export default function Home() {
               <Link href="/minicursos">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto text-lg px-8 py-6 h-auto bg-transparent border-white/20 text-white hover:bg-white/10">
                   Ver Minicursos
+                </Button>
+              </Link>
+              <a href="#programacao">
+                <Button variant="ghost" size="lg" className="w-full sm:w-auto text-lg px-8 py-6 h-auto text-white hover:bg-white/10">
+                  Programação
+                </Button>
+              </a>
+              <Link href="/localizacao">
+                <Button variant="ghost" size="lg" className="w-full sm:w-auto text-lg px-8 py-6 h-auto text-white hover:bg-white/10">
+                  Como chegar
                 </Button>
               </Link>
             </div>
@@ -131,7 +141,7 @@ export default function Home() {
       </section>
 
       {/* Schedule Timeline */}
-      <section className="py-24 bg-[#0A1628] relative z-10">
+      <section id="programacao" className="py-24 bg-[#0A1628] relative z-10">
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -198,13 +208,29 @@ export default function Home() {
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1" className="border-white/10">
               <AccordionTrigger className="text-left text-white hover:text-primary transition-colors">
+                Onde será realizado o evento?
+              </AccordionTrigger>
+              <AccordionContent className="text-gray-400">
+                O Conecta Orto 2025 será realizado no Campus Norte da FMUSP (Faculdade de Medicina da USP), Av. Dr. Arnaldo, 455 – Cerqueira César, São Paulo, SP. Acesso fácil por metrô (Estação Consolação) e com estacionamento no local.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2" className="border-white/10">
+              <AccordionTrigger className="text-left text-white hover:text-primary transition-colors">
+                O evento é gratuito?
+              </AccordionTrigger>
+              <AccordionContent className="text-gray-400">
+                A inscrição é gratuita. Vagas limitadas. Garanta sua participação o quanto antes.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3" className="border-white/10">
+              <AccordionTrigger className="text-left text-white hover:text-primary transition-colors">
                 O certificado tem validade para horas complementares?
               </AccordionTrigger>
               <AccordionContent className="text-gray-400">
                 Sim, todos os participantes receberão um certificado de 10 horas que pode ser utilizado como horas complementares em instituições de ensino. Os minicursos possuem certificados adicionais.
               </AccordionContent>
             </AccordionItem>
-            <AccordionItem value="item-2" className="border-white/10">
+            <AccordionItem value="item-4" className="border-white/10">
               <AccordionTrigger className="text-left text-white hover:text-primary transition-colors">
                 Posso me inscrever em mais de um minicurso?
               </AccordionTrigger>
@@ -212,7 +238,7 @@ export default function Home() {
                 Não. Como os minicursos ocorrem simultaneamente durante a tarde do congresso, você só poderá escolher um para participar.
               </AccordionContent>
             </AccordionItem>
-            <AccordionItem value="item-3" className="border-white/10">
+            <AccordionItem value="item-5" className="border-white/10">
               <AccordionTrigger className="text-left text-white hover:text-primary transition-colors">
                 O almoço está incluso na inscrição?
               </AccordionTrigger>
@@ -227,12 +253,55 @@ export default function Home() {
       {/* Sponsors Placeholder */}
       <section className="py-24 bg-[#0A1628] relative z-10">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-sm font-bold tracking-widest text-gray-500 uppercase mb-8">Patrocinadores Oficiais</h2>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-            <div className="w-32 h-12 bg-white/10 rounded-lg animate-pulse" />
-            <div className="w-32 h-12 bg-white/10 rounded-lg animate-pulse delay-75" />
-            <div className="w-32 h-12 bg-white/10 rounded-lg animate-pulse delay-150" />
-            <div className="w-32 h-12 bg-white/10 rounded-lg animate-pulse delay-200" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Patrocinadores</h2>
+            <p className="text-gray-400">Empresas que apoiam o futuro da ortopedia</p>
+          </motion.div>
+
+          <div className="space-y-16">
+            {/* Diamante */}
+            <div>
+              <h3 className="text-sm font-bold tracking-widest text-blue-400 uppercase mb-8">Cota Diamante</h3>
+              <div className="flex justify-center">
+                <Card className="glass-panel border-white/10 bg-white/5 w-64 h-32 flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <span className="text-xl font-bold text-white/50">Logo Diamante</span>
+                </Card>
+              </div>
+            </div>
+
+            {/* Ouro */}
+            <div>
+              <h3 className="text-sm font-bold tracking-widest text-yellow-400 uppercase mb-8">Cota Ouro</h3>
+              <div className="flex flex-wrap justify-center gap-8">
+                <Card className="glass-panel border-white/10 bg-white/5 w-48 h-24 flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <span className="text-lg font-bold text-white/50">Logo Ouro 1</span>
+                </Card>
+                <Card className="glass-panel border-white/10 bg-white/5 w-48 h-24 flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <span className="text-lg font-bold text-white/50">Logo Ouro 2</span>
+                </Card>
+              </div>
+            </div>
+
+            {/* Prata */}
+            <div>
+              <h3 className="text-sm font-bold tracking-widest text-gray-400 uppercase mb-8">Cota Prata</h3>
+              <div className="flex flex-wrap justify-center gap-6">
+                <Card className="glass-panel border-white/10 bg-white/5 w-40 h-20 flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <span className="font-bold text-white/50">Logo Prata 1</span>
+                </Card>
+                <Card className="glass-panel border-white/10 bg-white/5 w-40 h-20 flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <span className="font-bold text-white/50">Logo Prata 2</span>
+                </Card>
+                <Card className="glass-panel border-white/10 bg-white/5 w-40 h-20 flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <span className="font-bold text-white/50">Logo Prata 3</span>
+                </Card>
+              </div>
+            </div>
           </div>
         </div>
       </section>
