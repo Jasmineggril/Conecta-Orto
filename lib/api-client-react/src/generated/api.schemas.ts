@@ -63,6 +63,7 @@ export interface MinicourseWithCount {
   description: string;
   duration: string;
   maxCapacity: number;
+  type: string;
   enrollmentCount: number;
 }
 

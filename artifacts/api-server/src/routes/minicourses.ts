@@ -22,6 +22,7 @@ router.get("/minicourses", async (_req, res) => {
       description: c.description,
       duration: c.duration,
       maxCapacity: c.maxCapacity,
+      type: c.type,
       enrollmentCount: countMap[c.id] ?? 0,
     }))
   );

@@ -23,6 +23,7 @@ export const minicoursesTable = pgTable("minicourses", {
   description: text("description").notNull(),
   duration: text("duration").notNull(),
   maxCapacity: integer("max_capacity").notNull().default(30),
+  type: text("type").notNull().default("pratico"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

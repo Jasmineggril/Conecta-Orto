@@ -63,7 +63,7 @@ export default function Registration() {
           toast({
             variant: "destructive",
             title: "Erro na inscrição",
-            description: error.error || "Ocorreu um erro ao processar sua inscrição. Tente novamente.",
+            description: (error as { error?: string }).error || "Ocorreu um erro ao processar sua inscrição. Tente novamente.",
           });
         },
       }

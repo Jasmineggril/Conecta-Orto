@@ -321,9 +321,11 @@ components:
           type: string
         maxCapacity:
           type: integer
+        type:
+          type: string
         enrollmentCount:
           type: integer
-      required: [id, title, instructor, description, duration, maxCapacity, enrollmentCount]
+      required: [id, title, instructor, description, duration, maxCapacity, type, enrollmentCount]
 
     EnrollmentInput:
       type: object

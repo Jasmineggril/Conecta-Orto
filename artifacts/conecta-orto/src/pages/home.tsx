@@ -150,6 +150,48 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── VIDEO + ABOUT ───────────────────────────────────────────── */}
+      <section className="py-24 bg-[#0A1628]">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }} transition={{ duration: 0.7 }}
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-5 text-white">Sobre o Congresso</h2>
+              <p className="text-gray-400 text-lg leading-relaxed mb-4">
+                Muitas pessoas convivem com implantes ortopédicos — pinos, placas, próteses — ou enfrentarão essa realidade no futuro. O desconhecimento gera medo e insegurança.
+              </p>
+              <p className="text-gray-400 leading-relaxed mb-6">
+                O <strong className="text-white">Conecta Orto 2026</strong> foi criado para desmistificar essa tecnologia: explicar com clareza, mostrar a segurança por trás dos materiais e acolher quem tem dúvidas ou receios sobre os procedimentos.
+              </p>
+              <Link href="/inscricao">
+                <Button className="font-semibold">
+                  Ver a programação completa <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }} transition={{ duration: 0.7 }}
+              className="relative"
+            >
+              <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-primary/10 aspect-video">
+                <iframe
+                  src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1"
+                  title="Vídeo do Conecta Orto 2026"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
+              <div className="absolute -bottom-3 -right-3 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── ABOUT / PILLARS ──────────────────────────────────────────── */}
       <section className="py-24 bg-[#0A1628]">
         <div className="container mx-auto px-4">
@@ -197,7 +239,7 @@ export default function Home() {
             {[
               { value: "+300", label: "Participantes esperados" },
               { value: "8",    label: "Palestras e demonstrações" },
-              { value: "2",    label: "Minicursos práticos" },
+              { value: "5",    label: "Minicursos práticos" },
               { value: "10h",  label: "Carga horária certificada" },
             ].map(({ value, label }, i) => (
               <motion.div

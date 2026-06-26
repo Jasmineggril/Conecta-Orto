@@ -1,6 +1,11 @@
-import { db } from "@workspace/db";
-import { minicoursesTable } from "@workspace/db";
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
+import { minicoursesTable } from "./schema/index.js";
 import { eq } from "drizzle-orm";
+
+const { Pool } = pg;
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const db = drizzle(pool);
 
 const minicourses = [
   {
@@ -14,7 +19,7 @@ const minicourses = [
   {
     title: "Materiais Biocompatíveis: Do Titânio ao Polietileno",
     instructor: "Profa. Dra. Fernanda Lima",
-    description: "Exploração dos principais materiais usados em implantes ortopédicos, suas propriedades, vantagens e limitações na prática clínica.",
+    description: "Os principais materiais usados em implantes ortopédicos, suas propriedades, vantagens e limitações na prática clínica.",
     duration: "1h30",
     maxCapacity: 25,
     type: "teoria",
@@ -53,10 +58,13 @@ async function seed() {
       await db.insert(minicoursesTable).values(m);
       console.log(`Inserted: ${m.title}`);
     } else {
-      console.log(`Already exists, skipping: ${m.title}`);
+      // Update type in case it was inserted with wrong default
+      await db.update(minicoursesTable).set({ type: m.type }).where(eq(minicoursesTable.title, m.title));
+      console.log(`Updated type for: ${m.title} -> ${m.type}`);
     }
   }
   console.log("Done.");
+  await pool.end();
   process.exit(0);
 }
 

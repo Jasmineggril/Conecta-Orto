@@ -78,6 +78,7 @@ export const GetMinicoursesResponseItem = zod.object({
   "description": zod.string(),
   "duration": zod.string(),
   "maxCapacity": zod.number(),
+  "type": zod.string(),
   "enrollmentCount": zod.number()
 })
 export const GetMinicoursesResponse = zod.array(GetMinicoursesResponseItem)

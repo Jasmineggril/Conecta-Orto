@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Clock, User, Users } from "lucide-react";
+import { Clock, User, Users, FlaskConical, BookOpen, Wrench, Monitor, HeartPulse } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function Minicourses() {
@@ -75,7 +75,7 @@ export default function Minicourses() {
           toast({
             variant: "destructive",
             title: "Erro na matrícula",
-            description: error.error || "Você já está matriculado neste ou em outro minicurso.",
+            description: (error as { error?: string }).error || "Você já está matriculado neste ou em outro minicurso.",
           });
         },
       }
@@ -99,10 +99,19 @@ export default function Minicourses() {
         {isLoading ? (
           <div className="flex justify-center"><div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" /></div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {minicourses?.map((course) => {
               const percentage = Math.round((course.enrollmentCount / course.maxCapacity) * 100);
               const isFull = course.enrollmentCount >= course.maxCapacity;
+
+              const TYPE_MAP: Record<string, { label: string; color: string; Icon: React.ElementType }> = {
+                teoria:      { label: "Teórico",    color: "bg-blue-500/15 text-blue-300 border-blue-500/30",    Icon: BookOpen },
+                pratico:     { label: "Prático",    color: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", Icon: Wrench },
+                tecnologia:  { label: "Tecnologia", color: "bg-violet-500/15 text-violet-300 border-violet-500/30",  Icon: Monitor },
+                clinico:     { label: "Clínico",    color: "bg-pink-500/15 text-pink-300 border-pink-500/30",       Icon: HeartPulse },
+                laboratorio: { label: "Lab",        color: "bg-amber-500/15 text-amber-300 border-amber-500/30",    Icon: FlaskConical },
+              };
+              const typeInfo = TYPE_MAP[course.type] ?? TYPE_MAP["pratico"];
 
               return (
                 <motion.div
@@ -111,14 +120,18 @@ export default function Minicourses() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <Card className="h-full flex flex-col glass-panel border-white/10 bg-[#0D1F3C]/50">
+                  <Card className="h-full flex flex-col glass-panel border-white/10 bg-[#0D1F3C]/50 hover:border-primary/30 transition-all duration-300">
                     <CardHeader>
-                      <div className="flex justify-between items-start mb-2">
-                        <Badge variant={isFull ? "destructive" : "default"} className={!isFull ? "bg-primary text-primary-foreground" : ""}>
+                      <div className="flex justify-between items-start mb-2 gap-2 flex-wrap">
+                        <Badge className={`border text-xs font-medium ${typeInfo.color}`}>
+                          <typeInfo.Icon className="w-3 h-3 mr-1" />
+                          {typeInfo.label}
+                        </Badge>
+                        <Badge variant={isFull ? "destructive" : "outline"} className={!isFull ? "border-emerald-500/40 text-emerald-400 text-xs" : "text-xs"}>
                           {isFull ? "Esgotado" : "Vagas Abertas"}
                         </Badge>
                       </div>
-                      <CardTitle className="text-2xl text-white">{course.title}</CardTitle>
+                      <CardTitle className="text-xl text-white leading-snug">{course.title}</CardTitle>
                       <CardDescription className="text-gray-400 mt-2 line-clamp-3">
                         {course.description}
                       </CardDescription>
