@@ -1,0 +1,178 @@
+✅ CHECKLIST OFICIAL — Conecta Orto
+🟢 1. Identidade do Congresso (OBRIGATÓRIO)
+ Nome do congresso
+ Logo
+ Tema voltado à comunidade
+ Explicar os implantes ortopédicos
+ Passar credibilidade técnica
+ Identidade visual
+🟢 2. Página Inicial (OBRIGATÓRIO)
+
+Segundo o professor, a Home deve conter:
+
+ Vídeo incorporado (YouTube)
+ Apresentação do congresso
+ Texto acessível para a comunidade
+ Botão "Inscrever-se"
+ Botão "Minicursos"
+ Botão "Certificados"
+🟢 3. Inscrição (OBRIGATÓRIO)
+
+O sistema deve possuir:
+
+ Nome
+ E-mail
+ Telefone
+
+Extras recomendados
+
+ Cidade
+ Profissão
+🟢 4. Banco de Dados (OBRIGATÓRIO)
+
+O professor exige utilização de banco de dados.
+
+O sistema precisa:
+
+ Salvar inscritos
+ Salvar minicursos
+ Relacionar participante ↔ minicurso
+ Contar inscritos automaticamente
+🟢 5. Minicursos (OBRIGATÓRIO)
+
+Obrigatório:
+
+ Página de minicursos
+ Mostrar lista
+ Botão "Inscrever-se"
+
+Regra obrigatória:
+
+ Só pode se inscrever se estiver inscrito no evento
+
+Banco:
+
+ Registrar qual participante fez qual minicurso
+🟢 6. Certificados (OBRIGATÓRIO)
+
+Obrigatório:
+
+ Busca por e-mail
+
+Mostrar
+
+ Certificado do congresso
+ Certificado do minicurso
+
+PDF é opcional.
+
+🟢 7. Programação (OBRIGATÓRIO)
+
+O professor pede agenda do evento.
+
+Deve possuir:
+
+ Horário
+ Palestras
+ Oficinas
+ Minicursos
+ Início
+ Encerramento
+🟢 8. Congresso de 1 dia (OBRIGATÓRIO)
+
+Exemplo
+
+ Credenciamento
+ Abertura
+ Palestras
+ Coffee Break
+ Almoço
+ Minicursos
+ Encerramento
+🟢 9. Relatório PDF (OBRIGATÓRIO)
+
+O relatório deve conter:
+
+ Introdução
+ Desenvolvimento
+ Conclusão
+ Estrutura do Banco de Dados
+ Entre 4 e 40 páginas
+🟢 10. Experiência do Usuário (OBRIGATÓRIO)
+
+O professor informa que avaliará a UX.
+
+Verificar:
+
+ Site bonito
+ Fácil de usar
+ Botões funcionando
+ Layout responsivo
+ Navegação intuitiva
+🟢 11. Funcionalidade (OBRIGATÓRIO)
+
+Tudo deve funcionar.
+
+ Cadastro
+ Banco
+ Minicursos
+ Certificados
+ Contador
+🟢 12. Apresentação (OBRIGATÓRIO)
+
+O grupo deve estar preparado para responder perguntas técnicas.
+
+Saber explicar:
+
+ Banco de Dados
+ Front-end
+ Back-end
+ Fluxo do sistema
+ Tecnologias utilizadas
+⭐ Diferenciais (vale muitos pontos na apresentação)
+Interface
+ Tema profissional
+ Dark Mode
+ Glassmorphism
+ Animações
+ Responsividade
+ Loading
+Localização
+ Planta baixa
+ Zoom
+ Marcadores
+ Google Maps
+ Informações do Campus
+Evento
+ Contagem regressiva
+ Palestrantes
+ Patrocinadores
+ FAQ
+ Galeria
+ Cronograma bonito
+Administração
+ Dashboard Admin
+ Lista de inscritos
+ Exportar CSV
+ Estatísticas
+ Número de inscritos
+🏆 Checklist Final (100%)
+Obrigatório
+✅ Home
+✅ Vídeo
+✅ Texto
+✅ Inscrição
+✅ Banco de Dados
+✅ Contador de inscritos
+✅ Minicursos
+✅ Regra de inscrição em minicursos
+✅ Certificados
+✅ Busca por e-mail
+✅ Programação
+✅ Agenda de 1 dia
+✅ Relatório
+✅ Estrutura do banco
+✅ Boa experiência do usuário
+✅ Funcionalidade completa
+
+Se você concluir todos os itens da parte Obrigatória, terá atendido às exigências descritas pelo professor no enunciado da atividade. Os itens da seção Diferenciais não são exigidos, mas ajudam a destacar o projeto durante a apresentação.
