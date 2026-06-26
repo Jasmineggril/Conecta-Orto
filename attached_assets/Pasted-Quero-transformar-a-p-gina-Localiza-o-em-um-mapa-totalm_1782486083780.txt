@@ -1,0 +1,188 @@
+Quero transformar a página "Localização" em um mapa totalmente interativo.
+
+Utilize a planta baixa enviada como imagem principal.
+
+=========================
+LAYOUT
+=========================
+
+Centralizar a planta.
+
+Permitir:
+
+- Zoom (+)
+- Zoom (-)
+- Arrastar a planta (pan)
+- Tela cheia
+- Responsivo
+
+Adicionar efeito de hover sobre cada ponto.
+
+=========================
+CRIAR MARCADORES
+=========================
+
+Criar marcadores coloridos exatamente nestes locais:
+
+🔵 Biblioteca
+
+Descrição:
+Espaço para estudos e apoio aos participantes.
+
+🟢 Laboratórios
+
+Descrição:
+Demonstrações práticas sobre implantes ortopédicos.
+
+🟠 Sala de Treinamento
+
+Descrição:
+Oficinas e treinamentos durante o congresso.
+
+🟣 Sala de Aula 01
+
+Descrição:
+Minicurso 1 – Introdução aos Implantes.
+
+🟣 Sala de Aula 02
+
+Descrição:
+Minicurso 2 – Materiais Biocompatíveis.
+
+🟡 Banheiros
+
+Descrição:
+Sanitários disponíveis para todos os participantes.
+
+🔴 Entrada Principal
+
+Descrição:
+Acesso principal ao evento e credenciamento.
+
+⚫ Jardim Central
+
+Descrição:
+Área de convivência e Coffee Break.
+
+=========================
+POPUP
+=========================
+
+Ao clicar em qualquer marcador abrir um Card moderno contendo:
+
+Ícone
+
+Nome
+
+Descrição
+
+Horário de funcionamento
+
+Botão "Traçar rota"
+
+=========================
+LEGENDA
+=========================
+
+Criar uma legenda elegante abaixo do mapa.
+
+Cada cor deve representar um ambiente.
+
+=========================
+BUSCA
+=========================
+
+Adicionar uma caixa:
+
+"Encontrar ambiente"
+
+Exemplos:
+
+Biblioteca
+
+Sala de Aula
+
+Laboratório
+
+Banheiro
+
+Ao pesquisar:
+
+Centralizar o mapa naquele local.
+
+Destacar o marcador.
+
+=========================
+ANIMAÇÕES
+=========================
+
+Usar Framer Motion.
+
+Marcadores pulsando.
+
+Hover.
+
+Fade.
+
+=========================
+VISUAL
+=========================
+
+Inspirado em:
+
+Google Maps Indoor
+
+Apple Maps
+
+Museus
+
+Shoppings
+
+Eventos
+
+=========================
+EXTRAS
+=========================
+
+Adicionar botão:
+
+"Baixar planta em PDF"
+
+Adicionar botão:
+
+"Abrir no Google Maps"
+
+Adicionar informações:
+
+📍 Campus Norte
+
+🕒 08h às 18h
+
+🚗 Estacionamento gratuito
+
+♿ Local acessível
+
+=========================
+OBJETIVO
+=========================
+
+O usuário deve conseguir localizar qualquer ambiente do congresso apenas clicando no mapa.
+Eu ainda mudaria um detalhe importante
+
+Na imagem que você mostrou, a legenda está genérica ("Auditório", "Recepção", etc.), mas essa planta não possui esses ambientes exatamente dessa forma. Eu usaria os nomes que realmente aparecem nela:
+
+📚 Biblioteca
+🧪 Laboratório 01
+🧪 Laboratório 02
+🧪 Laboratório 03
+🧪 Laboratório 04
+🧪 Laboratório 05
+🧪 Laboratório 06
+🧪 Laboratório 07
+🏫 Sala de Treinamento
+🏫 Sala de Aula
+🌿 Jardim Central
+🚻 Banheiros
+🚪 Entrada Principal
+
+Assim o site fica coerente com a planta enviada e passa muito mais credibilidade para a apresentação.
