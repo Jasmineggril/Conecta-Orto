@@ -178,13 +178,17 @@ export default function Home() {
               className="relative"
             >
               <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-primary/10 aspect-video">
-                <iframe
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1"
-                  title="Vídeo do Conecta Orto 2026"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
-                />
+                <video
+                  controls
+                  autoplay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full rounded-xl shadow-lg"
+                >
+                  <source src="/videos/conecta-orto.mp4" type="video/mp4" />
+                  Seu navegador não suporta vídeos.
+                </video>
               </div>
               <div className="absolute -bottom-3 -right-3 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
             </motion.div>
