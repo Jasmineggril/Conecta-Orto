@@ -51,7 +51,7 @@ export default function AdminDashboard() {
     adminLogin.mutate(
       { data: { password } },
       {
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           localStorage.setItem("admin_token", data.token);
           setIsAuthenticated(true);
           toast({ title: "Login realizado com sucesso" });
@@ -74,7 +74,7 @@ export default function AdminDashboard() {
     if (!registrants) return;
 
     const headers = ["Nome", "E-mail", "Telefone", "Cidade", "Profissão", "Minicursos", "Data Inscrição"];
-    const rows = registrants.map(r => [
+    const rows = registrants.map((r: any) => [
       `"${r.name}"`,
       `"${r.email}"`,
       `"${r.phone}"`,
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
       `"${format(new Date(r.createdAt), 'dd/MM/yyyy HH:mm')}"`
     ]);
 
-    const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const csvContent = [headers.join(","), ...rows.map((row: string[]) => row.join(","))].join("\n");
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            {stats.minicourseEnrollments.map((course) => {
+            {stats.minicourseEnrollments.map((course: any) => {
               const pct = Math.round((course.enrollmentCount / course.maxCapacity) * 100);
               return (
                 <Card key={course.id} className="glass-panel border-white/10 bg-white/5">
@@ -196,7 +196,7 @@ export default function AdminDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {registrants.map((r) => (
+                  {registrants.map((r: any) => (
                     <TableRow key={r.id} className="border-white/10 hover:bg-white/5">
                       <TableCell className="font-medium text-white">{r.name}</TableCell>
                       <TableCell className="text-gray-300">{r.email}</TableCell>

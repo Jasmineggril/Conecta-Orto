@@ -75,6 +75,7 @@
     "zod": "catalog:"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.36.0",
     "react-zoom-pan-pinch": "^4.0.3",
     "yet-another-react-lightbox": "^3.32.0"
   }

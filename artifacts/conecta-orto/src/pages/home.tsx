@@ -180,7 +180,7 @@ export default function Home() {
               <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-primary/10 aspect-video">
                 <video
                   controls
-                  autoplay
+                  autoPlay
                   muted
                   loop
                   playsInline
@@ -431,36 +431,68 @@ export default function Home() {
       </section>
 
       {/* ─── SPONSORS ─────────────────────────────────────────────────── */}
-      <section className="py-20 bg-[#0A1628] border-t border-white/5">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-xs font-bold tracking-[0.25em] text-gray-600 uppercase mb-10">Patrocinadores Oficiais</p>
-          <div className="mb-6">
-            <p className="text-gray-600 text-xs uppercase tracking-widest mb-4">Diamante</p>
-            <div className="flex justify-center">
-              <div className="w-52 h-16 rounded-xl border border-white/5 bg-white/[0.02] flex items-center justify-center">
-                <span className="text-gray-700 text-sm font-medium">Seu logo aqui</span>
+      <section className="py-24 bg-[#0A1628] border-t border-white/5">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }} className="text-center mb-14"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Patrocinador Oficial</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              O Conecta Orto 2026 é realizado com o apoio institucional da Universidade do Distrito Federal, garantindo qualidade acadêmica, infraestrutura de excelência e credibilidade para o evento.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Patrocinador Diamante */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }} transition={{ duration: 0.5 }}
+              className="lg:col-span-1 md:col-span-2 md:mx-auto flex flex-col items-center justify-center"
+            >
+              <div className="w-full rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/5 p-8 flex flex-col items-center justify-center text-center hover:border-primary/50 transition-all duration-300">
+                <div className="mb-6 h-24 w-24 rounded-full bg-primary/20 flex items-center justify-center text-primary text-4xl font-bold">
+                  UDF
+                </div>
+                <h3 className="text-white text-xl font-bold mb-2">Universidade do Distrito Federal</h3>
+                <p className="text-gray-400 text-sm mb-3">Patrocinador Oficial</p>
+                <p className="text-gray-500 text-xs">
+                  SHIN CA 2, Lago Norte<br />Brasília — DF
+                </p>
               </div>
-            </div>
-          </div>
-          <div className="mb-6">
-            <p className="text-gray-600 text-xs uppercase tracking-widest mb-4">Ouro</p>
-            <div className="flex justify-center gap-6">
-              {[1, 2].map((n) => (
-                <div key={n} className="w-40 h-12 rounded-lg border border-white/5 bg-white/[0.02] flex items-center justify-center">
-                  <span className="text-gray-700 text-xs">Seu logo aqui</span>
+            </motion.div>
+
+            {/* Espaços para novos patrocinadores */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <div className="w-full h-full rounded-2xl border-2 border-white/10 bg-white/5 p-8 flex flex-col items-center justify-center text-center hover:border-white/20 transition-all duration-300">
+                <div className="mb-4 h-16 w-16 rounded-lg bg-white/5 flex items-center justify-center text-white/40 text-sm font-semibold">
+                  Logo
                 </div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className="text-gray-600 text-xs uppercase tracking-widest mb-4">Prata</p>
-            <div className="flex flex-wrap justify-center gap-4">
-              {[1, 2, 3].map((n) => (
-                <div key={n} className="w-28 h-10 rounded-lg border border-white/5 bg-white/[0.02] flex items-center justify-center">
-                  <span className="text-gray-700 text-xs">Logo</span>
+                <p className="text-gray-500 text-sm">Seu logo aqui</p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <div className="w-full h-full rounded-2xl border-2 border-white/10 bg-white/5 p-8 flex flex-col items-center justify-center text-center hover:border-white/20 transition-all duration-300">
+                <div className="mb-4 h-16 w-16 rounded-lg bg-white/5 flex items-center justify-center text-white/40 text-sm font-semibold">
+                  Logo
                 </div>
-              ))}
-            </div>
+                <p className="text-gray-500 text-sm">Seu logo aqui</p>
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="mt-12 pt-12 border-t border-white/5 text-center">
+            <p className="text-gray-500 text-sm">
+              Interesse em patrocinar o Conecta Orto 2026?<br />
+              Entre em contato através do email do evento ou visite a Universidade do Distrito Federal.
+            </p>
           </div>
         </div>
       </section>

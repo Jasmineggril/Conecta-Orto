@@ -1,12 +1,11 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLookupRegistration } from "@workspace/api-client-react";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, Award, Download, Calendar, MapPin, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import type { RegistrationWithEnrollments } from "@workspace/api-client-react";
 
 function CertificateCard({
   name,
@@ -87,25 +86,69 @@ function CertificateCard({
   );
 }
 
+interface EnrollmentRecord {
+  minicourse_id: number;
+  minicourses: {
+    title: string;
+    instructor: string;
+  } | null;
+}
+
+interface CertificateData {
+  id: number;
+  name: string;
+  enrollments: Array<{ title: string; instructor: string }>; 
+}
+
 export default function Certificates() {
   const [email, setEmail] = useState("");
-  const [data, setData] = useState<RegistrationWithEnrollments | null>(null);
-  const lookupRegistration = useLookupRegistration();
+  const [data, setData] = useState<CertificateData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    lookupRegistration.mutate(
-      { data: { email } },
-      {
-        onSuccess: (res) => setData(res),
-        onError: () => {
-          toast({ variant: "destructive", title: "Não encontrado", description: "Nenhum cadastro encontrado para este e-mail." });
-          setData(null);
-        },
-      }
-    );
+
+    setIsLoading(true);
+    setData(null);
+
+    const { data: registration, error: registrationError } = await supabase
+      .from("registrations")
+      .select("id, name")
+      .eq("email", email)
+      .single();
+
+    if (registrationError || !registration) {
+      setIsLoading(false);
+      toast({ variant: "destructive", title: "Não encontrado", description: "Nenhum cadastro encontrado para este e-mail." });
+      return;
+    }
+
+    const { data: enrollments, error: enrollmentsError } = await supabase
+      .from("enrollments")
+      .select("minicourse_id, minicourses(title, instructor)")
+      .eq("registration_id", registration.id);
+
+    setIsLoading(false);
+
+    if (enrollmentsError) {
+      console.error(enrollmentsError);
+      toast({ variant: "destructive", title: "Erro", description: "Não foi possível buscar os certificados." });
+      return;
+    }
+
+    setData({
+      id: registration.id,
+      name: registration.name,
+      enrollments: (enrollments ?? []).map((item: any) => {
+        const related = item.minicourses?.[0] ?? item.minicourses;
+        return {
+          title: related?.title ?? "Minicurso",
+          instructor: related?.instructor ?? "",
+        };
+      }),
+    });
   };
 
   return (
@@ -138,8 +181,8 @@ export default function Certificates() {
                     className="pl-10 bg-black/20 border-white/10 text-white h-12 placeholder:text-gray-600"
                   />
                 </div>
-                <Button type="submit" className="h-12 px-8" disabled={lookupRegistration.isPending}>
-                  {lookupRegistration.isPending ? "Buscando..." : "Buscar"}
+                <Button type="submit" className="h-12 px-8" disabled={isLoading}>
+                  {isLoading ? "Buscando..." : "Buscar"}
                 </Button>
               </form>
             </CardContent>
@@ -165,9 +208,9 @@ export default function Certificates() {
 
               <CertificateCard name={data.name} type="event" title="Conecta Orto 2026" hours="10 (dez) horas" />
 
-              {data.enrollments.map((enrollment) => (
+              {data.enrollments.map((enrollment, index) => (
                 <CertificateCard
-                  key={enrollment.minicourseId}
+                  key={`${enrollment.title}-${index}`}
                   name={data.name}
                   type="minicourse"
                   title={enrollment.title}
@@ -186,7 +229,7 @@ export default function Certificates() {
         </AnimatePresence>
 
         {/* Preview note (when no search done yet) */}
-        {!data && !lookupRegistration.isPending && (
+        {!data && !isLoading && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-4">
             <p className="text-center text-gray-600 text-sm mb-8">— prévia do certificado —</p>
             <CertificateCard name="Nome do Participante" type="event" title="Conecta Orto 2026" hours="10 (dez) horas" />
