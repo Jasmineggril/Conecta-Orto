@@ -14,14 +14,15 @@ function getJwtSecret(): string {
 function authMiddleware(req: Request, res: Response, next: NextFunction) {
   const auth = req.headers["authorization"];
   if (!auth?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Não autorizado" });
+    res.status(401).json({ error: "Não autorizado" });
+    return;
   }
   const token = auth.slice(7);
   try {
     jwt.verify(token, getJwtSecret());
     next();
   } catch {
-    return res.status(401).json({ error: "Token inválido ou expirado" });
+    res.status(401).json({ error: "Token inválido ou expirado" });
   }
 }
 
