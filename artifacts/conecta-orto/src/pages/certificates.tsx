@@ -7,6 +7,121 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Search, Award, Download, Calendar, MapPin, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+/* ─────────────────────────────────────────────────────────
+   Utilitário: abre janela de impressão (salvar como PDF)
+   ───────────────────────────────────────────────────────── */
+function printCertificate(opts: {
+  name: string;
+  type: "event" | "minicourse";
+  title: string;
+  hours: string;
+  instructor?: string;
+}) {
+  const isPrimary = opts.type === "event";
+
+  const bodyText = isPrimary
+    ? `participou do <strong>Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</strong>,
+       realizado em 09 de julho de 2026, Universidade do Distrito Federal Jorge Amaury,
+       Lago Norte, Brasília — DF, com carga horária de <strong>${opts.hours}</strong>.`
+    : `concluiu o minicurso <strong>&ldquo;${opts.title}&rdquo;</strong>${
+        opts.instructor ? `, ministrado por <strong>${opts.instructor}</strong>` : ""
+      }, com carga horária de <strong>${opts.hours}</strong>.`;
+
+  const accentColor = isPrimary ? "#1E6FFF" : "#6b7280";
+  const bgTop = isPrimary ? "#0a1f44" : "#0f1e35";
+  const bgBot = isPrimary ? "#091535" : "#111e30";
+  const kind = isPrimary ? "Certificado de Participação" : "Certificado de Minicurso";
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <title>${kind} – ${opts.name}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@1,700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    @page { size: A4 landscape; margin: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      width: 297mm; height: 210mm;
+      overflow: hidden;
+      background: linear-gradient(135deg, ${bgTop} 0%, ${bgBot} 100%);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cert { width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; }
+    .bar { height: 10px; background: linear-gradient(90deg, ${accentColor}, #60a5fa, ${accentColor}); }
+    .circle-tl { position: absolute; top: 30px; left: 30px; width: 120px; height: 120px;
+      border-radius: 50%; border: 1px solid rgba(255,255,255,0.06); }
+    .circle-br { position: absolute; bottom: 30px; right: 30px; width: 120px; height: 120px;
+      border-radius: 50%; border: 1px solid rgba(255,255,255,0.06); }
+    .body {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 16mm 28mm; text-align: center;
+    }
+    .label { text-transform: uppercase; letter-spacing: 0.3em; font-size: 11px;
+      font-weight: 600; color: ${accentColor}; margin-bottom: 10px; }
+    .divider { width: 60px; height: 1px;
+      background: linear-gradient(90deg, transparent, ${accentColor}, transparent);
+      margin: 0 auto 14px; }
+    .certifies { font-size: 13px; color: #9ca3af; margin-bottom: 6px; }
+    .participant-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 38px; font-style: italic; font-weight: 700;
+      color: #fff; margin-bottom: 14px; line-height: 1.1;
+    }
+    .description { font-size: 13px; color: #d1d5db; max-width: 480px;
+      line-height: 1.8; margin-bottom: 18px; }
+    .meta { display: flex; gap: 24px; justify-content: center;
+      font-size: 11px; color: #6b7280; margin-top: 4px; }
+    .footer {
+      padding: 8px 28mm; background: rgba(0,0,0,0.25);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 10px; color: #4b5563;
+    }
+  </style>
+</head>
+<body>
+<div class="cert">
+  <div class="bar"></div>
+  <div class="circle-tl"></div>
+  <div class="circle-br"></div>
+  <div class="body">
+    <div class="label">${kind}</div>
+    <div class="divider"></div>
+    <div class="certifies">Certificamos que</div>
+    <div class="participant-name">${opts.name}</div>
+    <div class="description">${bodyText}</div>
+    <div class="divider"></div>
+    <div class="meta">
+      <span>📅 09 de Julho de 2026</span>
+      <span>📍 UnDF Jorge Amaury, Brasília — DF</span>
+    </div>
+  </div>
+  <div class="bar"></div>
+  <div class="footer">
+    <span>🏅 conectaorto.com.br/certificados</span>
+    <span>Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</span>
+  </div>
+</div>
+<script>
+  window.onload = function() {
+    setTimeout(function() { window.print(); setTimeout(function(){ window.close(); }, 800); }, 600);
+  };
+<\/script>
+</body>
+</html>`;
+
+  const win = window.open("", "_blank");
+  if (!win) {
+    alert("Permita pop-ups para baixar o certificado.");
+    return;
+  }
+  win.document.write(html);
+  win.document.close();
+}
+
 function CertificateCard({
   name,
   type,
@@ -77,7 +192,7 @@ function CertificateCard({
           size="sm"
           variant={isPrimary ? "default" : "outline"}
           className={`text-xs h-8 ${!isPrimary ? "border-white/10 text-gray-400 hover:text-white" : ""}`}
-          onClick={() => {}}
+          onClick={() => printCertificate({ name, type, title, hours, instructor })}
         >
           <Download className="w-3 h-3 mr-1" /> Baixar PDF
         </Button>

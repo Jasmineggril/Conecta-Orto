@@ -36,6 +36,7 @@ export default function Minicourses() {
   const [enrollmentError, setEnrollmentError] = useState<string | null>(null);
   const [isLookupPending, setIsLookupPending] = useState(false);
   const [isEnrollmentPending, setIsEnrollmentPending] = useState(false);
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState<Set<number>>(new Set());
 
   const handleEnrollClick = (courseId: number) => {
     setSelectedCourseId(courseId);
@@ -94,6 +95,8 @@ export default function Minicourses() {
     }
 
     toast({ title: "Matrícula confirmada!", description: "Você foi matriculado no minicurso com sucesso." });
+    // Mark this course as enrolled in the current session
+    setEnrolledCourseIds((prev) => new Set(prev).add(selectedCourseId));
     setSelectedCourseId(null);
     setEmail("");
     setRegistrationId(null);
@@ -122,7 +125,7 @@ export default function Minicourses() {
       instructor: item.instructor,
       duration: item.duration,
       type: item.type ?? "pratico",
-      capacity: item.max_capacity ?? item.maxCapacity ?? 0,
+      capacity: item.max_capacity ?? item.maxCapacity ?? 200,
       created_at: item.created_at,
       enrollment_count: item.enrollments?.length ?? 0,
     }));
@@ -216,10 +219,15 @@ export default function Minicourses() {
                     <CardFooter>
                       <Button 
                         className="w-full" 
-                        disabled={isFull}
+                        disabled={isFull || enrolledCourseIds.has(course.id)}
                         onClick={() => handleEnrollClick(course.id)}
+                        variant={enrolledCourseIds.has(course.id) ? "outline" : "default"}
                       >
-                        {isFull ? "Lista de Espera" : "Garantir Vaga"}
+                        {enrolledCourseIds.has(course.id)
+                          ? "✓ Inscrito"
+                          : isFull
+                          ? "Lista de Espera"
+                          : "Garantir Vaga"}
                       </Button>
                     </CardFooter>
                   </Card>
