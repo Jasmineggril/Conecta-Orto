@@ -14,7 +14,7 @@ import {
   Microscope, Stethoscope, Brain, Shield
 } from "lucide-react";
 
-const TARGET_DATE = new Date("2026-07-09T08:00:00").getTime();
+const TARGET_DATE = new Date("2026-07-09T10:10:00").getTime();
 
 const SCHEDULE = [
   { time: "08:00", title: "Credenciamento e recepção", type: "logistics", speaker: "" },
@@ -452,7 +452,7 @@ export default function Home() {
             >
               <div className="w-full rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/5 p-8 flex flex-col items-center justify-center text-center hover:border-primary/50 transition-all duration-300">
                 <div className="mb-6 h-24 w-24 rounded-full bg-primary/20 flex items-center justify-center text-primary text-4xl font-bold">
-                  UDF
+                  UNDF
                 </div>
                 <h3 className="text-white text-xl font-bold mb-2">Universidade do Distrito Federal</h3>
                 <p className="text-gray-400 text-sm mb-3">Patrocinador Oficial</p>

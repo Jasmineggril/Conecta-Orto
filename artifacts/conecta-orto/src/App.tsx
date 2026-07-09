@@ -13,6 +13,7 @@ import AdminDashboard from "@/pages/admin";
 import Localizacao from "@/pages/localizacao";
 import Palestrantes from "@/pages/palestrantes";
 import Galeria from "@/pages/galeria";
+import { UserProvider } from "@/lib/user-context";
 
 const queryClient = new QueryClient();
 
@@ -38,9 +39,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
+        <UserProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+        </UserProvider>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

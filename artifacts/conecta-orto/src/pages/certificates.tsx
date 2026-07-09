@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, Award, Download, Calendar, MapPin, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/lib/user-context";
 
 /* ─────────────────────────────────────────────────────────
    Utilitário: abre janela de impressão (salvar como PDF)
@@ -16,13 +17,20 @@ function printCertificate(opts: {
   title: string;
   hours: string;
   instructor?: string;
+  enrolledCourses?: string[];
 }) {
   const isPrimary = opts.type === "event";
+
+  let minicoursesText = "";
+  if (isPrimary && opts.enrolledCourses && opts.enrolledCourses.length > 0) {
+    const coursesStr = opts.enrolledCourses.map(c => `&ldquo;${c}&rdquo;`).join(", ");
+    minicoursesText = ` além de concluir os minicursos: <strong>${coursesStr}</strong>,`;
+  }
 
   const bodyText = isPrimary
     ? `participou do <strong>Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</strong>,
        realizado em 09 de julho de 2026, Universidade do Distrito Federal Jorge Amaury,
-       Lago Norte, Brasília — DF, com carga horária de <strong>${opts.hours}</strong>.`
+       Lago Norte, Brasília — DF,${minicoursesText} com carga horária total de <strong>${opts.hours}</strong>.`
     : `concluiu o minicurso <strong>&ldquo;${opts.title}&rdquo;</strong>${
         opts.instructor ? `, ministrado por <strong>${opts.instructor}</strong>` : ""
       }, com carga horária de <strong>${opts.hours}</strong>.`;
@@ -128,12 +136,14 @@ function CertificateCard({
   title,
   hours,
   instructor,
+  enrolledCourses = [],
 }: {
   name: string;
   type: "event" | "minicourse";
   title: string;
   hours: string;
   instructor?: string;
+  enrolledCourses?: string[];
 }) {
   const isPrimary = type === "event";
 
@@ -166,7 +176,7 @@ function CertificateCard({
 
           <p className="text-gray-300 text-sm max-w-sm mx-auto leading-relaxed mb-4">
             {isPrimary
-              ? <>participou do <strong className="text-white">Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</strong>, realizado em 09 de julho de 2026, Universidade do Distrito Federal Jorge Amaury, Lago Norte, Brasília — DF, com carga horária de <strong className="text-white">{hours}</strong>.</>
+              ? <>participou do <strong className="text-white">Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</strong>, realizado em 09 de julho de 2026, Universidade do Distrito Federal Jorge Amaury, Lago Norte, Brasília — DF, {enrolledCourses.length > 0 ? <>além de concluir os minicursos: <strong className="text-white">{enrolledCourses.map(c => `"${c}"`).join(", ")}</strong>, </> : ""}com carga horária total de <strong className="text-white">{hours}</strong>.</>
               : <>concluiu o minicurso <strong className="text-white">"{title}"</strong>{instructor ? <>, ministrado por <strong className="text-white">{instructor}</strong></> : null}, com carga horária de <strong className="text-white">{hours}</strong>.</>
             }
           </p>
@@ -192,7 +202,7 @@ function CertificateCard({
           size="sm"
           variant={isPrimary ? "default" : "outline"}
           className={`text-xs h-8 ${!isPrimary ? "border-white/10 text-gray-400 hover:text-white" : ""}`}
-          onClick={() => printCertificate({ name, type, title, hours, instructor })}
+          onClick={() => printCertificate({ name, type, title, hours, instructor, enrolledCourses })}
         >
           <Download className="w-3 h-3 mr-1" /> Baixar PDF
         </Button>
@@ -216,7 +226,8 @@ interface CertificateData {
 }
 
 export default function Certificates() {
-  const [email, setEmail] = useState("");
+  const { user, setUser } = useUser();
+  const [email, setEmail] = useState(user?.email ?? "");
   const [data, setData] = useState<CertificateData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -239,6 +250,9 @@ export default function Certificates() {
       toast({ variant: "destructive", title: "Não encontrado", description: "Nenhum cadastro encontrado para este e-mail." });
       return;
     }
+
+    // Salva sessão do usuário após busca bem-sucedida
+    setUser({ id: registration.id, name: registration.name, email });
 
     const { data: enrollments, error: enrollmentsError } = await supabase
       .from("enrollments")
@@ -321,7 +335,13 @@ export default function Certificates() {
                 </div>
               </div>
 
-              <CertificateCard name={data.name} type="event" title="Conecta Orto 2026" hours="10 (dez) horas" />
+              <CertificateCard 
+                name={data.name} 
+                type="event" 
+                title="Conecta Orto 2026" 
+                hours="10 (dez) horas" 
+                enrolledCourses={data.enrollments.map(e => e.title)}
+              />
 
               {data.enrollments.map((enrollment, index) => (
                 <CertificateCard

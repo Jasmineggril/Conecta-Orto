@@ -9,7 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Clock, User, Users, FlaskConical, BookOpen, Wrench, Monitor, HeartPulse } from "lucide-react";
+import { Clock, User, Users, FlaskConical, BookOpen, Wrench, Monitor, HeartPulse, CheckCircle2 } from "lucide-react";
+import { useUser } from "@/lib/user-context";
 
 interface MinicourseItem {
   id: number;
@@ -24,6 +25,7 @@ interface MinicourseItem {
 
 export default function Minicourses() {
   const { toast } = useToast();
+  const { user, setUser } = useUser();
 
   const [minicourses, setMinicourses] = useState<MinicourseItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,13 +40,21 @@ export default function Minicourses() {
   const [isEnrollmentPending, setIsEnrollmentPending] = useState(false);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState<Set<number>>(new Set());
 
+  // Abre o modal — se o usuário já estiver logado, pula direto para confirmação
   const handleEnrollClick = (courseId: number) => {
     setSelectedCourseId(courseId);
-    setEmail("");
-    setModalStep("email");
-    setRegistrationId(null);
-    setRegistrationName("");
     setEnrollmentError(null);
+    if (user) {
+      setEmail(user.email);
+      setRegistrationId(user.id);
+      setRegistrationName(user.name);
+      setModalStep("confirm");
+    } else {
+      setEmail("");
+      setRegistrationId(null);
+      setRegistrationName("");
+      setModalStep("email");
+    }
   };
 
   const handleLookup = async () => {
@@ -74,6 +84,8 @@ export default function Minicourses() {
     setRegistrationId(data.id);
     setRegistrationName(data.name);
     setModalStep("confirm");
+    // Salva sessão do usuário
+    setUser({ id: data.id, name: data.name, email });
   };
 
   const handleConfirmEnrollment = async () => {
@@ -134,9 +146,21 @@ export default function Minicourses() {
     setIsLoading(false);
   }
 
+  // Carrega inscrições existentes do usuário logado
   useEffect(() => {
+    async function loadUserEnrollments() {
+      if (!user) return;
+      const { data, error } = await supabase
+        .from("enrollments")
+        .select("minicourse_id")
+        .eq("registration_id", user.id);
+      if (!error && data) {
+        setEnrolledCourseIds(new Set(data.map((e: any) => e.minicourse_id)));
+      }
+    }
     loadMinicourses();
-  }, []);
+    loadUserEnrollments();
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen bg-[#0A1628] py-12 relative">
@@ -274,8 +298,9 @@ export default function Minicourses() {
                   <p className="text-sm text-gray-400 mb-1">Inscrição encontrada para:</p>
                   <p className="font-bold text-lg text-white">{registrationName}</p>
                 </div>
-                <p className="text-sm text-gray-300">
-                  Atenção: Você só pode se matricular em um minicurso.
+                <p className="text-sm text-gray-300 flex items-center gap-2">
+                  <CheckCircle2 size={14} className="text-emerald-400" />
+                  Você pode se inscrever em quantos minicursos quiser!
                 </p>
                 <Button 
                   className="w-full" 

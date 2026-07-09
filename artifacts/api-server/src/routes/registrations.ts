@@ -66,4 +66,32 @@ router.post("/registrations/lookup", async (req, res) => {
   });
 });
 
+router.get("/registrations/by-id/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
+
+  const [reg] = await db
+    .select()
+    .from(registrationsTable)
+    .where(eq(registrationsTable.id, id))
+    .limit(1);
+  if (!reg) return res.status(404).json({ error: "Inscrição não encontrada" });
+
+  const enrollments = await db
+    .select({
+      minicourseId: enrollmentsTable.minicourseId,
+      title: minicoursesTable.title,
+      instructor: minicoursesTable.instructor,
+    })
+    .from(enrollmentsTable)
+    .innerJoin(minicoursesTable, eq(enrollmentsTable.minicourseId, minicoursesTable.id))
+    .where(eq(enrollmentsTable.registrationId, reg.id));
+
+  return res.json({
+    ...reg,
+    createdAt: reg.createdAt.toISOString(),
+    enrollments,
+  });
+});
+
 export default router;

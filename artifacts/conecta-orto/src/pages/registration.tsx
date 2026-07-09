@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useUser } from "@/lib/user-context";
 
 const registrationSchema = z.object({
   name: z.string().min(2, "Nome é obrigatório"),
@@ -31,6 +32,7 @@ const registrationSchema = z.object({
 export default function Registration() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { setUser } = useUser();
   const [regCount, setRegCount] = useState<number | null>(null);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -84,6 +86,8 @@ export default function Registration() {
     }
 
     setRegCount((current) => (current ?? 0) + 1);
+    // Salva sessão do usuário
+    if (data) setUser({ id: data.id, name: data.name, email: data.email });
     toast({
       title: "Inscrição realizada com sucesso!",
       description: "Você já pode se matricular nos minicursos.",

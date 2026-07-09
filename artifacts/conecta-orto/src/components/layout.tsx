@@ -1,20 +1,33 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Instagram, Linkedin, Youtube, MapPin, Mail, Phone } from "lucide-react";
+import { Menu, X, Instagram, Linkedin, Youtube, MapPin, Mail, Phone, LogOut, User } from "lucide-react";
 import logo from "@assets/image_1782408441192.png";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/lib/user-context";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [avatarOpen, setAvatarOpen] = useState(false);
   const [location] = useLocation();
+  const { user, logout } = useUser();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Fecha o dropdown ao clicar fora
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setAvatarOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   const navLinks = [
@@ -26,6 +39,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { href: "/palestrantes", label: "Palestrantes" },
     { href: "/galeria", label: "Galeria" },
   ];
+
+  // Iniciais do nome para o avatar
+  const initials = user?.name
+    ? user.name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase()
+    : "";
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background text-foreground">
@@ -54,18 +72,88 @@ export function Layout({ children }: { children: React.ReactNode }) {
             ))}
             <Link href="/admin">
               <Button variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10">
-                Área do Congressista
+                Área do Administrador
               </Button>
             </Link>
+
+            {/* Avatar / Login indicator */}
+            {user ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setAvatarOpen((v) => !v)}
+                  className="flex items-center gap-2 group focus:outline-none"
+                  title={user.name}
+                >
+                  {/* Green dot indicator */}
+                  <div className="relative">
+                    <div className="w-9 h-9 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center text-primary text-sm font-bold select-none">
+                      {initials}
+                    </div>
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#0A1628]" />
+                  </div>
+                  <span className="text-sm text-gray-300 group-hover:text-white max-w-[100px] truncate hidden lg:block">
+                    {user.name.split(" ")[0]}
+                  </span>
+                </button>
+
+                {/* Dropdown */}
+                {avatarOpen && (
+                  <div className="absolute right-0 mt-2 w-52 rounded-xl glass-panel border border-white/10 shadow-2xl py-2 z-50">
+                    <div className="px-4 py-2 border-b border-white/10">
+                      <p className="text-white text-sm font-semibold truncate">{user.name}</p>
+                      <p className="text-gray-500 text-xs truncate">{user.email}</p>
+                    </div>
+                    <Link href="/certificados" onClick={() => setAvatarOpen(false)}>
+                      <button className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-colors">
+                        <User size={14} /> Meus Certificados
+                      </button>
+                    </Link>
+                    <Link href="/minicursos" onClick={() => setAvatarOpen(false)}>
+                      <button className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-colors">
+                        <User size={14} /> Meus Minicursos
+                      </button>
+                    </Link>
+                    <button
+                      onClick={() => { logout(); setAvatarOpen(false); }}
+                      className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-white/5 flex items-center gap-2 transition-colors"
+                    >
+                      <LogOut size={14} /> Sair
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link href="/inscricao">
+                <button className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors" title="Faça login com seu e-mail">
+                  <div className="relative">
+                    <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+                      <User size={14} className="text-gray-400" />
+                    </div>
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-gray-600 rounded-full border-2 border-[#0A1628]" />
+                  </div>
+                </button>
+              </Link>
+            )}
           </nav>
 
           {/* Mobile Toggle */}
-          <button
-            className="md:hidden text-white"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="md:hidden flex items-center gap-3">
+            {/* Mobile avatar */}
+            {user && (
+              <div className="relative">
+                <div className="w-8 h-8 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center text-primary text-xs font-bold">
+                  {initials}
+                </div>
+                <span className="absolute bottom-0 right-0 w-2 h-2 bg-emerald-400 rounded-full border border-[#0A1628]" />
+              </div>
+            )}
+            <button
+              className="text-white"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Nav */}
@@ -85,9 +173,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
             ))}
             <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
               <Button variant="outline" className="border-white/10 mt-2">
-                Área do Congressista
+                Área do Administrador
               </Button>
             </Link>
+            {user && (
+              <button
+                onClick={() => { logout(); setMobileMenuOpen(false); }}
+                className="flex items-center gap-2 text-sm text-red-400 hover:text-red-300 py-2 transition-colors"
+              >
+                <LogOut size={14} /> Sair ({user.name.split(" ")[0]})
+              </button>
+            )}
           </div>
         )}
       </header>
