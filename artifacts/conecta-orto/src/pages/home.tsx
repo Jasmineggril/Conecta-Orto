@@ -14,7 +14,7 @@ import {
   Microscope, Stethoscope, Brain, Shield
 } from "lucide-react";
 
-const TARGET_DATE = new Date("2026-07-09T10:10:00").getTime();
+const TARGET_DATE = new Date("2026-08-23T08:00:00").getTime();
 
 const SCHEDULE = [
   { time: "08:00", title: "Credenciamento e recepção", type: "logistics", speaker: "" },

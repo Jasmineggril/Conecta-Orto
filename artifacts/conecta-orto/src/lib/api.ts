@@ -3,7 +3,7 @@
  * Used by admin components and new public pages.
  */
 
-const API_BASE = "/api";
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "") + "/api";
 
 function getToken(): string | null {
   return typeof localStorage !== "undefined" ? localStorage.getItem("admin_token") : null;
