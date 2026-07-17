@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import FloorPlan from "@/components/FloorPlan";
 import { TransformWrapper, TransformComponent, useControls } from "react-zoom-pan-pinch";
 import {
   MapPin, ZoomIn, ZoomOut, Maximize2, ExternalLink,
@@ -437,8 +436,12 @@ export default function Localizacao() {
                     className="relative w-full h-full"
                     onClick={() => { setActiveMarker(null); setHighlightedId(null); setSearch(""); }}
                   >
-                    {/* Inline SVG blueprint — fills 100% × 100% so markers align */}
-                    <FloorPlan />
+                    {/* Planta real do campus UnDF */}
+                    <img
+                      src="/planta-campus.png"
+                      alt="Planta do campus UnDF"
+                      className="w-full h-full object-contain pointer-events-none select-none"
+                    />
                     {/* Marker overlay — same coordinate system as SVG viewBox */}
                     <div className="absolute inset-0">
                       {MARKERS.map((m) => (
