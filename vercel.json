@@ -1,6 +1,6 @@
 {
-  "buildCommand": "pnpm install && NODE_ENV=production pnpm --filter @workspace/conecta-orto run build && cp -r artifacts/conecta-orto/dist/public ./dist-vercel",
-  "outputDirectory": "dist-vercel",
+  "buildCommand": "pnpm install && NODE_ENV=production pnpm run build",
+  "outputDirectory": "dist/public",
   "headers": [
     {
       "source": "/(.*)",
