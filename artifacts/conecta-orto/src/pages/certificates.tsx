@@ -1,151 +1,159 @@
 import { FormEvent, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Award, Download, Calendar, MapPin, CheckCircle2 } from "lucide-react";
+import { Search, Award, Download, Calendar, MapPin, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useUser } from "@/lib/user-context";
+import { Link } from "wouter";
 
-/* ─────────────────────────────────────────────────────────
-   Utilitário: abre janela de impressão (salvar como PDF)
-   ───────────────────────────────────────────────────────── */
-function printCertificate(opts: {
+/* ─── Types ─────────────────────────────────────────────────────── */
+interface CertInfo {
+  id: number;
+  type: "event" | "minicourse";
+  validationCode: string;
+  workload: string;
+  status: string;
+  issuedAt: string;
+  minicourseId?: number;
+  minicourseTitle?: string;
+  minicourseInstructor?: string;
+}
+
+interface RegistrationInfo {
+  id: number;
+  name: string;
+  emailConfirmed: boolean;
+  eventPresence: boolean;
+  certificateReleased: boolean;
+}
+
+interface LookupResult {
+  registration: RegistrationInfo;
+  certificates: CertInfo[];
+  enrollments: Array<{ title: string; instructor: string; workload: string; generatesCertificate: boolean }>;
+  eligibility: { event: boolean };
+}
+
+/* ─── PDF generation (no external library — uses Blob + HTML) ───── */
+function generatePDFBlob(opts: {
   name: string;
   type: "event" | "minicourse";
   title: string;
   hours: string;
   instructor?: string;
+  validationCode: string;
+  issuedAt?: string;
   enrolledCourses?: string[];
-}) {
+}): void {
   const isPrimary = opts.type === "event";
-
-  let minicoursesText = "";
-  if (isPrimary && opts.enrolledCourses && opts.enrolledCourses.length > 0) {
-    const coursesStr = opts.enrolledCourses.map(c => `&ldquo;${c}&rdquo;`).join(", ");
-    minicoursesText = ` além de concluir os minicursos: <strong>${coursesStr}</strong>,`;
-  }
-
-  const bodyText = isPrimary
-    ? `participou do <strong>Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</strong>,
-       realizado em 09 de julho de 2026, Universidade do Distrito Federal Jorge Amaury,
-       Lago Norte, Brasília — DF,${minicoursesText} com carga horária total de <strong>${opts.hours}</strong>.`
-    : `concluiu o minicurso <strong>&ldquo;${opts.title}&rdquo;</strong>${
-        opts.instructor ? `, ministrado por <strong>${opts.instructor}</strong>` : ""
-      }, com carga horária de <strong>${opts.hours}</strong>.`;
-
   const accentColor = isPrimary ? "#1E6FFF" : "#6b7280";
   const bgTop = isPrimary ? "#0a1f44" : "#0f1e35";
   const bgBot = isPrimary ? "#091535" : "#111e30";
   const kind = isPrimary ? "Certificado de Participação" : "Certificado de Minicurso";
+  const shortCode = opts.validationCode ? opts.validationCode.slice(0, 16).toUpperCase() : "";
+  const issuedDate = opts.issuedAt
+    ? new Date(opts.issuedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })
+    : new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+
+  let minicoursesText = "";
+  if (isPrimary && opts.enrolledCourses && opts.enrolledCourses.length > 0) {
+    minicoursesText = ` além de ter participado dos minicursos: <em>${opts.enrolledCourses.join(", ")}</em>,`;
+  }
+
+  const bodyText = isPrimary
+    ? `participou do <strong>Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</strong>, realizado em 09 de julho de 2026 na Universidade do Distrito Federal Professor Jorge Amaury Maia Nunes — UnDF, Lago Norte, Brasília — DF,${minicoursesText} com carga horária total de <strong>${opts.hours}</strong>.`
+    : `concluiu o minicurso <strong>"${opts.title}"</strong>${opts.instructor ? `, ministrado por <strong>${opts.instructor}</strong>` : ""}, com carga horária de <strong>${opts.hours}</strong>.`;
+
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(`${location.origin}/certificados/validar/${opts.validationCode}`)}`;
 
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8"/>
-  <title>${kind} – ${opts.name}</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@1,700&display=swap');
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    @page { size: A4 landscape; margin: 0; }
-    body {
-      font-family: 'Inter', sans-serif;
-      width: 297mm; height: 210mm;
-      overflow: hidden;
-      background: linear-gradient(135deg, ${bgTop} 0%, ${bgBot} 100%);
-      color: #fff;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .cert { width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; }
-    .bar { height: 10px; background: linear-gradient(90deg, ${accentColor}, #60a5fa, ${accentColor}); }
-    .circle-tl { position: absolute; top: 30px; left: 30px; width: 120px; height: 120px;
-      border-radius: 50%; border: 1px solid rgba(255,255,255,0.06); }
-    .circle-br { position: absolute; bottom: 30px; right: 30px; width: 120px; height: 120px;
-      border-radius: 50%; border: 1px solid rgba(255,255,255,0.06); }
-    .body {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 16mm 28mm; text-align: center;
-    }
-    .label { text-transform: uppercase; letter-spacing: 0.3em; font-size: 11px;
-      font-weight: 600; color: ${accentColor}; margin-bottom: 10px; }
-    .divider { width: 60px; height: 1px;
-      background: linear-gradient(90deg, transparent, ${accentColor}, transparent);
-      margin: 0 auto 14px; }
-    .certifies { font-size: 13px; color: #9ca3af; margin-bottom: 6px; }
-    .participant-name {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 38px; font-style: italic; font-weight: 700;
-      color: #fff; margin-bottom: 14px; line-height: 1.1;
-    }
-    .description { font-size: 13px; color: #d1d5db; max-width: 480px;
-      line-height: 1.8; margin-bottom: 18px; }
-    .meta { display: flex; gap: 24px; justify-content: center;
-      font-size: 11px; color: #6b7280; margin-top: 4px; }
-    .footer {
-      padding: 8px 28mm; background: rgba(0,0,0,0.25);
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 10px; color: #4b5563;
-    }
-  </style>
+<meta charset="UTF-8"/>
+<title>${kind} – ${opts.name}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+@page{size:A4 landscape;margin:0}
+html,body{
+  font-family:'Inter',sans-serif;
+  width:297mm;height:210mm;overflow:hidden;
+  background:linear-gradient(135deg,${bgTop} 0%,${bgBot} 100%);
+  color:#fff;
+}
+.cert{width:100%;height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.bar{height:10px;background:linear-gradient(90deg,${accentColor},#60a5fa,${accentColor})}
+.deco-tl{position:absolute;top:20px;left:20px;width:120px;height:120px;border-radius:50%;border:1px solid rgba(255,255,255,0.05)}
+.deco-br{position:absolute;bottom:30px;right:20px;width:100px;height:100px;border-radius:50%;border:1px solid rgba(255,255,255,0.05)}
+.body{flex:1;display:flex;align-items:center;justify-content:center;padding:12mm 28mm;position:relative;z-index:1}
+.inner{text-align:center;max-width:200mm}
+.kind{text-transform:uppercase;letter-spacing:0.3em;font-size:10px;font-weight:700;color:${accentColor};margin-bottom:8px}
+.divider{width:50px;height:1px;background:linear-gradient(90deg,transparent,${accentColor},transparent);margin:0 auto 12px}
+.certifies{font-size:12px;color:#9ca3af;margin-bottom:4px}
+.participant{font-family:'Playfair Display',Georgia,serif;font-size:36px;font-style:italic;font-weight:700;color:#fff;margin-bottom:12px;line-height:1.1}
+.description{font-size:12px;color:#d1d5db;max-width:460px;margin:0 auto 14px;line-height:1.8}
+.meta{display:flex;gap:20px;justify-content:center;font-size:10px;color:#6b7280;margin-bottom:14px}
+.footer-row{padding:6px 28mm;background:rgba(0,0,0,0.2);display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#4b5563}
+.qr{position:absolute;right:20mm;bottom:40px;text-align:center}
+.qr img{width:60px;height:60px;border:1px solid rgba(255,255,255,0.1);border-radius:4px}
+.qr p{font-size:7px;color:#4b5563;margin-top:2px}
+.code-box{position:absolute;left:20mm;bottom:40px;font-size:8px;color:#4b5563}
+.code-box span{font-family:monospace;color:${accentColor};font-size:9px}
+</style>
 </head>
 <body>
 <div class="cert">
   <div class="bar"></div>
-  <div class="circle-tl"></div>
-  <div class="circle-br"></div>
+  <div class="deco-tl"></div>
+  <div class="deco-br"></div>
   <div class="body">
-    <div class="label">${kind}</div>
-    <div class="divider"></div>
-    <div class="certifies">Certificamos que</div>
-    <div class="participant-name">${opts.name}</div>
-    <div class="description">${bodyText}</div>
-    <div class="divider"></div>
-    <div class="meta">
-      <span>📅 09 de Julho de 2026</span>
-      <span>📍 UnDF Jorge Amaury, Brasília — DF</span>
+    <div class="inner">
+      <div class="kind">${kind}</div>
+      <div class="divider"></div>
+      <div class="certifies">Certificamos que</div>
+      <div class="participant">${opts.name}</div>
+      <div class="description">${bodyText}</div>
+      <div class="divider"></div>
+      <div class="meta">
+        <span>📅 09 de Julho de 2026</span>
+        <span>📍 UnDF Jorge Amaury, Brasília — DF</span>
+        <span>📆 Emitido em ${issuedDate}</span>
+      </div>
     </div>
   </div>
+  ${shortCode ? `<div class="code-box">Código de validação:<br/><span>${shortCode}</span></div>` : ""}
+  <div class="qr">
+    <img src="${qrUrl}" alt="QR Code de validação"/>
+    <p>Validar certificado</p>
+  </div>
   <div class="bar"></div>
-  <div class="footer">
-    <span>🏅 conectaorto.com.br/certificados</span>
+  <div class="footer-row">
     <span>Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</span>
+    <span>Universidade do Distrito Federal Professor Jorge Amaury Maia Nunes — UnDF</span>
   </div>
 </div>
 <script>
-  window.onload = function() {
-    setTimeout(function() { window.print(); setTimeout(function(){ window.close(); }, 800); }, 600);
-  };
+window.onload=function(){setTimeout(function(){window.print();},800)};
 <\/script>
-</body>
-</html>`;
+</body></html>`;
 
   const win = window.open("", "_blank");
-  if (!win) {
-    alert("Permita pop-ups para baixar o certificado.");
-    return;
-  }
+  if (!win) { alert("Permita pop-ups para baixar o certificado."); return; }
   win.document.write(html);
   win.document.close();
 }
 
+/* ─── Certificate Card ────────────────────────────────────────── */
 function CertificateCard({
-  name,
-  type,
-  title,
-  hours,
-  instructor,
-  enrolledCourses = [],
+  cert, name, enrolledCourses,
 }: {
+  cert: CertInfo;
   name: string;
-  type: "event" | "minicourse";
-  title: string;
-  hours: string;
-  instructor?: string;
   enrolledCourses?: string[];
 }) {
-  const isPrimary = type === "event";
+  const isPrimary = cert.type === "event";
+  const isActive = cert.status === "ativo";
 
   return (
     <div
@@ -160,34 +168,35 @@ function CertificateCard({
       <div className={`h-1.5 ${isPrimary ? "bg-gradient-to-r from-primary via-blue-400 to-primary" : "bg-gradient-to-r from-gray-600 via-gray-400 to-gray-600"}`} />
 
       <div className="px-8 py-10 text-center relative">
-        {/* decorative */}
         <div className="absolute top-4 left-4 w-16 h-16 rounded-full border border-white/5 opacity-40" />
         <div className="absolute bottom-4 right-4 w-16 h-16 rounded-full border border-white/5 opacity-40" />
-
         <div className="relative z-10">
           <p className={`uppercase tracking-[0.3em] text-xs font-semibold mb-4 ${isPrimary ? "text-primary" : "text-gray-400"}`}>
             {isPrimary ? "Certificado de Participação" : "Certificado de Minicurso"}
           </p>
-
           <div className={`w-12 h-px mx-auto mb-4 ${isPrimary ? "bg-gradient-to-r from-transparent via-primary to-transparent" : "bg-gradient-to-r from-transparent via-gray-500 to-transparent"}`} />
-
           <p className="text-gray-400 text-sm mb-2">Certificamos que</p>
           <p className={`text-2xl md:text-3xl font-bold mb-3 italic ${isPrimary ? "text-white" : "text-gray-200"}`}>{name}</p>
-
           <p className="text-gray-300 text-sm max-w-sm mx-auto leading-relaxed mb-4">
             {isPrimary
-              ? <>participou do <strong className="text-white">Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</strong>, realizado em 09 de julho de 2026, Universidade do Distrito Federal Jorge Amaury, Lago Norte, Brasília — DF, {enrolledCourses.length > 0 ? <>além de concluir os minicursos: <strong className="text-white">{enrolledCourses.map(c => `"${c}"`).join(", ")}</strong>, </> : ""}com carga horária total de <strong className="text-white">{hours}</strong>.</>
-              : <>concluiu o minicurso <strong className="text-white">"{title}"</strong>{instructor ? <>, ministrado por <strong className="text-white">{instructor}</strong></> : null}, com carga horária de <strong className="text-white">{hours}</strong>.</>
+              ? <>participou do <strong className="text-white">Conecta Orto 2026 — O Futuro dos Implantes Ortopédicos</strong>, realizado em 09 de julho de 2026, UnDF Jorge Amaury, Brasília — DF, {enrolledCourses && enrolledCourses.length > 0 && <>concluiu os minicursos <strong className="text-white">{enrolledCourses.join(", ")}</strong>, </>}com carga horária de <strong className="text-white">{cert.workload}</strong>.</>
+              : <>concluiu o minicurso <strong className="text-white">"{cert.minicourseTitle}"</strong>{cert.minicourseInstructor ? <>, ministrado por <strong className="text-white">{cert.minicourseInstructor}</strong></> : null}, com carga horária de <strong className="text-white">{cert.workload}</strong>.</>
             }
           </p>
-
-          <div className={`w-12 h-px mx-auto mb-6 ${isPrimary ? "bg-gradient-to-r from-transparent via-primary to-transparent" : "bg-gradient-to-r from-transparent via-gray-500 to-transparent"}`} />
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-2 text-xs text-gray-500">
+          <div className={`w-12 h-px mx-auto mb-4 ${isPrimary ? "bg-gradient-to-r from-transparent via-primary to-transparent" : "bg-gradient-to-r from-transparent via-gray-500 to-transparent"}`} />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-xs text-gray-500">
             <span className="flex items-center gap-1"><Calendar size={11} /> 09 de Julho de 2026</span>
             <span className="hidden sm:block w-1 h-1 rounded-full bg-gray-600" />
             <span className="flex items-center gap-1"><MapPin size={11} /> UnDF Jorge Amaury, Brasília — DF</span>
           </div>
+          {cert.validationCode && (
+            <div className="mt-3 flex items-center justify-center gap-2">
+              <code className="text-xs text-gray-600 font-mono">{cert.validationCode.slice(0, 16).toUpperCase()}</code>
+              <Link href={`/certificados/validar/${cert.validationCode}`}>
+                <span className="text-xs text-primary underline cursor-pointer">validar</span>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
@@ -196,94 +205,68 @@ function CertificateCard({
       <div className="px-8 py-4 bg-black/20 flex items-center justify-between">
         <span className="text-xs text-gray-500 flex items-center gap-1">
           <Award size={11} className={isPrimary ? "text-primary" : "text-gray-500"} />
-          conectaorto.com.br/certificados
+          {isActive ? "Ativo" : "Cancelado"}
         </span>
         <Button
           size="sm"
           variant={isPrimary ? "default" : "outline"}
-          className={`text-xs h-8 ${!isPrimary ? "border-white/10 text-gray-400 hover:text-white" : ""}`}
-          onClick={() => printCertificate({ name, type, title, hours, instructor, enrolledCourses })}
+          className={`text-xs h-8 gap-1.5 ${!isPrimary ? "border-white/10 text-gray-400 hover:text-white" : ""}`}
+          disabled={!isActive}
+          onClick={() => generatePDFBlob({
+            name,
+            type: cert.type,
+            title: cert.minicourseTitle ?? "Conecta Orto 2026",
+            hours: cert.workload,
+            instructor: cert.minicourseInstructor,
+            validationCode: cert.validationCode,
+            issuedAt: cert.issuedAt,
+            enrolledCourses,
+          })}
         >
-          <Download className="w-3 h-3 mr-1" /> Baixar PDF
+          <Download className="w-3 h-3" /> Baixar PDF
         </Button>
       </div>
     </div>
   );
 }
 
-interface EnrollmentRecord {
-  minicourse_id: number;
-  minicourses: {
-    title: string;
-    instructor: string;
-  } | null;
-}
-
-interface CertificateData {
-  id: number;
-  name: string;
-  enrollments: Array<{ title: string; instructor: string }>; 
-}
-
+/* ─── Main page ──────────────────────────────────────────────── */
 export default function Certificates() {
-  const { user, setUser } = useUser();
-  const [email, setEmail] = useState(user?.email ?? "");
-  const [data, setData] = useState<CertificateData | null>(null);
+  const [email, setEmail] = useState("");
+  const [result, setResult] = useState<LookupResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const { toast } = useToast();
 
   const handleSearch = async (e: FormEvent) => {
     e.preventDefault();
     if (!email) return;
-
     setIsLoading(true);
-    setData(null);
+    setResult(null);
+    setNotFound(false);
+    setErrorMsg("");
 
-    const { data: registration, error: registrationError } = await supabase
-      .from("registrations")
-      .select("id, name")
-      .eq("email", email)
-      .single();
-
-    if (registrationError || !registration) {
-      setIsLoading(false);
-      toast({ variant: "destructive", title: "Não encontrado", description: "Nenhum cadastro encontrado para este e-mail." });
-      return;
-    }
-
-    // Salva sessão do usuário após busca bem-sucedida
-    setUser({ id: registration.id, name: registration.name, email });
-
-    const { data: enrollments, error: enrollmentsError } = await supabase
-      .from("enrollments")
-      .select("minicourse_id, minicourses(title, instructor)")
-      .eq("registration_id", registration.id);
-
+    const res = await fetch(`/api/certificates/lookup?email=${encodeURIComponent(email.toLowerCase())}`);
+    const body = await res.json();
     setIsLoading(false);
 
-    if (enrollmentsError) {
-      console.error(enrollmentsError);
-      toast({ variant: "destructive", title: "Erro", description: "Não foi possível buscar os certificados." });
+    if (!res.ok) {
+      if (res.status === 403) {
+        setErrorMsg(body.error ?? "Cadastro não confirmado.");
+      } else {
+        setNotFound(true);
+      }
       return;
     }
-
-    setData({
-      id: registration.id,
-      name: registration.name,
-      enrollments: (enrollments ?? []).map((item: any) => {
-        const related = item.minicourses?.[0] ?? item.minicourses;
-        return {
-          title: related?.title ?? "Minicurso",
-          instructor: related?.instructor ?? "",
-        };
-      }),
-    });
+    setResult(body);
   };
+
+  const enrolledCourseTitles = result?.enrollments.map(e => e.title) ?? [];
 
   return (
     <div className="min-h-screen bg-[#0A1628] py-12">
       <div className="container mx-auto px-4 max-w-4xl">
-
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium mb-6">
@@ -291,7 +274,7 @@ export default function Certificates() {
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Seus Certificados</h1>
           <p className="text-gray-400 max-w-lg mx-auto">
-            Informe o e-mail usado na inscrição no evento para visualizar seus certificados de participação.
+            Informe o e-mail usado na inscrição para visualizar e baixar seus certificados em PDF.
           </p>
         </motion.div>
 
@@ -311,63 +294,89 @@ export default function Certificates() {
                   />
                 </div>
                 <Button type="submit" className="h-12 px-8" disabled={isLoading}>
-                  {isLoading ? "Buscando..." : "Buscar"}
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Buscar"}
                 </Button>
               </form>
             </CardContent>
           </Card>
         </motion.div>
 
+        {/* Error states */}
+        <AnimatePresence>
+          {notFound && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6">
+                <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+                <p className="text-red-300 text-sm">Nenhum cadastro encontrado para este e-mail.</p>
+              </div>
+            </motion.div>
+          )}
+          {errorMsg && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-6">
+                <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
+                <div>
+                  <p className="text-amber-300 text-sm">{errorMsg}</p>
+                  <p className="text-amber-400/60 text-xs mt-1">Verifique sua caixa de entrada e spam para o e-mail de confirmação.</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Results */}
         <AnimatePresence>
-          {data && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="space-y-6"
-            >
+          {result && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-white font-semibold">{data.name}</p>
-                  <p className="text-gray-500 text-sm">{data.enrollments.length + 1} certificado{data.enrollments.length !== 0 ? "s" : ""} disponível{data.enrollments.length !== 0 ? "is" : ""}</p>
+                  <p className="text-white font-semibold">{result.registration.name}</p>
+                  <p className="text-gray-500 text-sm">{result.certificates.length} certificado{result.certificates.length !== 1 ? "s" : ""} disponíve{result.certificates.length !== 1 ? "is" : "l"}</p>
                 </div>
               </div>
 
-              <CertificateCard 
-                name={data.name} 
-                type="event" 
-                title="Conecta Orto 2026" 
-                hours="10 (dez) horas" 
-                enrolledCourses={data.enrollments.map(e => e.title)}
-              />
+              {result.certificates.length === 0 && (
+                <div className="text-center py-12 glass-panel border border-white/10 rounded-2xl">
+                  <Award className="w-10 h-10 mx-auto mb-3 text-gray-600" />
+                  <p className="text-gray-400 font-medium mb-2">Nenhum certificado disponível</p>
+                  <p className="text-gray-600 text-sm max-w-sm mx-auto">
+                    Os certificados são liberados após confirmação de presença e aprovação pela organização do evento.
+                  </p>
+                  {!result.registration.emailConfirmed && (
+                    <p className="text-amber-400 text-xs mt-3">⚠️ Seu e-mail ainda não foi confirmado.</p>
+                  )}
+                  {result.registration.emailConfirmed && !result.registration.eventPresence && (
+                    <p className="text-amber-400 text-xs mt-3">⚠️ Sua presença no evento ainda não foi registrada.</p>
+                  )}
+                  {result.registration.emailConfirmed && result.registration.eventPresence && !result.registration.certificateReleased && (
+                    <p className="text-amber-400 text-xs mt-3">⚠️ Os certificados ainda não foram liberados pela organização.</p>
+                  )}
+                </div>
+              )}
 
-              {data.enrollments.map((enrollment, index) => (
+              {result.certificates.map(cert => (
                 <CertificateCard
-                  key={`${enrollment.title}-${index}`}
-                  name={data.name}
-                  type="minicourse"
-                  title={enrollment.title}
-                  hours="4 (quatro) horas"
-                  instructor={enrollment.instructor}
+                  key={cert.id}
+                  cert={cert}
+                  name={result.registration.name}
+                  enrolledCourses={cert.type === "event" ? enrolledCourseTitles : undefined}
                 />
               ))}
-
-              {data.enrollments.length === 0 && (
-                <p className="text-center text-gray-600 text-sm pt-2">
-                  Você não possui certificados de minicursos. Ainda é possível se inscrever em minicursos.
-                </p>
-              )}
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Preview note (when no search done yet) */}
-        {!data && !isLoading && (
+        {/* Preview when no search yet */}
+        {!result && !isLoading && !notFound && !errorMsg && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-4">
             <p className="text-center text-gray-600 text-sm mb-8">— prévia do certificado —</p>
-            <CertificateCard name="Nome do Participante" type="event" title="Conecta Orto 2026" hours="10 (dez) horas" />
+            <CertificateCard
+              cert={{ id: 0, type: "event", validationCode: "PREVIEW", workload: "10 horas", status: "ativo", issuedAt: new Date().toISOString() }}
+              name="Nome do Participante"
+            />
           </motion.div>
         )}
       </div>

@@ -1,0 +1,1 @@
+- [Conecta Orto architecture](conecta-orto-arch.md) — full-stack event site: React+Vite frontend, Express API, Drizzle+Postgres, JWT admin auth.

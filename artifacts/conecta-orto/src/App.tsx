@@ -13,7 +13,10 @@ import AdminDashboard from "@/pages/admin";
 import Localizacao from "@/pages/localizacao";
 import Palestrantes from "@/pages/palestrantes";
 import Galeria from "@/pages/galeria";
+import ConfirmEmail from "@/pages/confirm-email";
+import ValidateCertificate from "@/pages/validate-certificate";
 import { UserProvider } from "@/lib/user-context";
+import GuidedTour from "@/components/GuidedTour";
 
 const queryClient = new QueryClient();
 
@@ -25,10 +28,12 @@ function Router() {
         <Route path="/inscricao" component={Registration} />
         <Route path="/minicursos" component={Minicourses} />
         <Route path="/certificados" component={Certificates} />
+        <Route path="/certificados/validar/:code" component={ValidateCertificate} />
         <Route path="/admin" component={AdminDashboard} />
         <Route path="/localizacao" component={Localizacao} />
         <Route path="/palestrantes" component={Palestrantes} />
         <Route path="/galeria" component={Galeria} />
+        <Route path="/confirmar/:token" component={ConfirmEmail} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
@@ -42,6 +47,7 @@ function App() {
         <UserProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
             <Router />
+            <GuidedTour />
           </WouterRouter>
         </UserProvider>
         <Toaster />

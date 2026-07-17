@@ -1,98 +1,64 @@
 import { useState, useEffect } from "react";
-import { 
-  useAdminLogin, 
-  useGetAdminStats, 
-  useGetAdminRegistrants,
-  getGetAdminStatsQueryKey,
-  getGetAdminRegistrantsQueryKey,
-  setAuthTokenGetter
-} from "@workspace/api-client-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Users, Lock, LogOut } from "lucide-react";
-import { format } from "date-fns";
+import { Lock, LogOut, LayoutDashboard, Users, BookOpen, Award, Mic, Image, Home, Building2, Settings } from "lucide-react";
+import { api } from "@/lib/api";
+import AdminOverview from "@/components/admin/AdminOverview";
+import AdminStudents from "@/components/admin/AdminStudents";
+import AdminMinicourses from "@/components/admin/AdminMinicourses";
+import AdminSpeakers from "@/components/admin/AdminSpeakers";
+import AdminGallery from "@/components/admin/AdminGallery";
+import AdminHomepage from "@/components/admin/AdminHomepage";
+import AdminSponsors from "@/components/admin/AdminSponsors";
+import AdminCertificates from "@/components/admin/AdminCertificates";
+
+type TabId = "overview" | "students" | "minicourses" | "certificates" | "speakers" | "gallery" | "homepage" | "sponsors" | "settings";
+
+const TABS: Array<{ id: TabId; label: string; icon: React.ComponentType<{ className?: string }> }> = [
+  { id: "overview",     label: "Visão Geral",   icon: LayoutDashboard },
+  { id: "students",     label: "Alunos",         icon: Users           },
+  { id: "minicourses",  label: "Minicursos",     icon: BookOpen        },
+  { id: "certificates", label: "Certificados",   icon: Award           },
+  { id: "speakers",     label: "Palestrantes",   icon: Mic             },
+  { id: "gallery",      label: "Galeria",        icon: Image           },
+  { id: "homepage",     label: "Página Inicial", icon: Home            },
+  { id: "sponsors",     label: "Patrocinadores", icon: Building2       },
+  { id: "settings",     label: "Configurações",  icon: Settings        },
+];
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
+  const [loggingIn, setLoggingIn] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { toast } = useToast();
 
-  const adminLogin = useAdminLogin();
-  
-  // Set the token getter for Orval hooks
   useEffect(() => {
-    setAuthTokenGetter(() => localStorage.getItem("admin_token"));
-    if (localStorage.getItem("admin_token")) {
-      setIsAuthenticated(true);
-    }
+    if (localStorage.getItem("admin_token")) setIsAuthenticated(true);
   }, []);
 
-  const { data: stats, refetch: refetchStats } = useGetAdminStats({
-    query: { enabled: isAuthenticated, queryKey: getGetAdminStatsQueryKey() }
-  });
-  
-  const { data: registrants, refetch: refetchRegistrants } = useGetAdminRegistrants({
-    query: { enabled: isAuthenticated, queryKey: getGetAdminRegistrantsQueryKey() }
-  });
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    adminLogin.mutate(
-      { data: { password } },
-      {
-        onSuccess: (data: any) => {
-          localStorage.setItem("admin_token", data.token);
-          setIsAuthenticated(true);
-          toast({ title: "Login realizado com sucesso" });
-          refetchStats();
-          refetchRegistrants();
-        },
-        onError: () => {
-          toast({ variant: "destructive", title: "Senha incorreta" });
-        }
-      }
-    );
+    setLoggingIn(true);
+    try {
+      const { token } = await api.post<{ token: string }>("/admin/login", { password });
+      localStorage.setItem("admin_token", token);
+      setIsAuthenticated(true);
+      toast({ title: "Login realizado com sucesso" });
+    } catch {
+      toast({ variant: "destructive", title: "Senha incorreta" });
+    } finally {
+      setLoggingIn(false);
+    }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
     setIsAuthenticated(false);
-  };
-
-  const exportCSV = () => {
-    if (!registrants) return;
-
-    const headers = ["Nome", "E-mail", "Telefone", "Cidade", "Profissão", "Minicursos", "Data Inscrição"];
-    const rows = registrants.map((r: any) => [
-      `"${r.name}"`,
-      `"${r.email}"`,
-      `"${r.phone}"`,
-      `"${r.city}"`,
-      `"${r.profession}"`,
-      `"${r.minicourses.join(' / ')}"`,
-      `"${format(new Date(r.createdAt), 'dd/MM/yyyy HH:mm')}"`
-    ]);
-
-    const csvContent = [headers.join(","), ...rows.map((row: string[]) => row.join(","))].join("\n");
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `conecta_orto_registrants_${format(new Date(), 'yyyyMMdd')}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    setPassword("");
   };
 
   if (!isAuthenticated) {
@@ -100,24 +66,24 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-[#0A1628] flex items-center justify-center p-4">
         <Card className="w-full max-w-md glass-panel border-white/10 bg-[#0D1F3C]/80">
           <CardHeader className="text-center pb-2">
-            <div className="mx-auto w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mb-4">
-              <Lock className="text-primary w-6 h-6" />
+            <div className="mx-auto w-14 h-14 bg-primary/20 rounded-full flex items-center justify-center mb-4">
+              <Lock className="text-primary w-7 h-7" />
             </div>
             <CardTitle className="text-2xl text-white">Área Restrita</CardTitle>
+            <p className="text-gray-500 text-sm mt-1">Acesso exclusivo para administradores</p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Input
-                  type="password"
-                  placeholder="Senha de acesso"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-black/20 border-white/10 text-white h-12 text-center text-lg"
-                />
-              </div>
-              <Button type="submit" className="w-full h-12" disabled={adminLogin.isPending}>
-                {adminLogin.isPending ? "Acessando..." : "Entrar"}
+              <Input
+                type="password"
+                placeholder="Senha de acesso"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-black/20 border-white/10 text-white h-12 text-center text-lg"
+                autoFocus
+              />
+              <Button type="submit" className="w-full h-12" disabled={loggingIn}>
+                {loggingIn ? "Verificando..." : "Entrar"}
               </Button>
             </form>
           </CardContent>
@@ -127,103 +93,128 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A1628] py-8">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-          <h1 className="text-3xl font-bold text-white">Painel de Controle</h1>
-          <Button variant="outline" className="border-white/10 text-gray-300 hover:text-white" onClick={handleLogout}>
-            <LogOut className="w-4 h-4 mr-2" /> Sair
+    <div className="min-h-screen bg-[#0A1628] flex">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed top-0 left-0 h-full w-64 bg-[#0D1F3C] border-r border-white/10 z-30
+        transition-transform duration-300 lg:translate-x-0 lg:static lg:flex lg:flex-col
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+      `}>
+        <div className="p-6 border-b border-white/10">
+          <div className="text-lg font-bold text-white">
+            <span className="text-primary">Conecta</span> Orto
+          </div>
+          <p className="text-xs text-gray-500 mt-0.5">Painel Administrativo</p>
+        </div>
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => { setActiveTab(tab.id); setSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left text-sm transition-colors ${
+                activeTab === tab.id
+                  ? "bg-primary/20 text-primary font-medium"
+                  : "text-gray-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <tab.icon className="w-4 h-4 shrink-0" />
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+        <div className="p-3 border-t border-white/10">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 text-gray-400 hover:text-white hover:bg-white/5"
+            onClick={handleLogout}
+          >
+            <LogOut className="w-4 h-4" /> Sair
           </Button>
         </div>
+      </aside>
 
-        {/* Dashboard Stats */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="glass-panel border-white/10 bg-primary/10">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Total Inscritos</p>
-                    <h3 className="text-4xl font-bold text-white">{stats.totalRegistrants}</h3>
-                  </div>
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                    <Users className="text-primary w-6 h-6" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top bar (mobile) */}
+        <header className="lg:hidden flex items-center justify-between p-4 border-b border-white/10 bg-[#0D1F3C]">
+          <button onClick={() => setSidebarOpen(true)} className="text-gray-400 hover:text-white">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <span className="text-white font-semibold">{TABS.find(t => t.id === activeTab)?.label}</span>
+          <Button variant="ghost" size="icon" className="text-gray-400 h-8 w-8" onClick={handleLogout}>
+            <LogOut className="w-4 h-4" />
+          </Button>
+        </header>
 
-            {stats.minicourseEnrollments.map((course: any) => {
-              const pct = Math.round((course.enrollmentCount / course.maxCapacity) * 100);
-              return (
-                <Card key={course.id} className="glass-panel border-white/10 bg-white/5">
-                  <CardContent className="pt-6">
-                    <p className="text-sm font-medium text-gray-400 truncate mb-1" title={course.title}>
-                      Minicurso: {course.title}
-                    </p>
-                    <div className="flex items-end justify-between mb-2">
-                      <h3 className="text-2xl font-bold text-white">{course.enrollmentCount}</h3>
-                      <span className="text-sm text-gray-400">/ {course.maxCapacity} vagas</span>
-                    </div>
-                    <Progress value={pct} className="h-2 bg-black/40" />
-                  </CardContent>
-                </Card>
-              );
-            })}
+        <main className="flex-1 p-6 overflow-y-auto">
+          <div className="max-w-7xl mx-auto">
+            {/* Desktop header */}
+            <div className="hidden lg:flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-2xl font-bold text-white">{TABS.find(t => t.id === activeTab)?.label}</h1>
+                <p className="text-gray-500 text-sm mt-0.5">Conecta Orto 2026</p>
+              </div>
+            </div>
+
+            {/* Tab content */}
+            {activeTab === "overview"     && <AdminOverview />}
+            {activeTab === "students"     && <AdminStudents />}
+            {activeTab === "minicourses"  && <AdminMinicourses />}
+            {activeTab === "certificates" && <AdminCertificates />}
+            {activeTab === "speakers"     && <AdminSpeakers />}
+            {activeTab === "gallery"      && <AdminGallery />}
+            {activeTab === "homepage"     && <AdminHomepage />}
+            {activeTab === "sponsors"     && <AdminSponsors />}
+            {activeTab === "settings"     && <SettingsPanel onLogout={handleLogout} />}
           </div>
-        )}
-
-        {/* Table Section */}
-        <Card className="glass-panel border-white/10 bg-[#0D1F3C]/50">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-xl text-white">Inscrições Recentes</CardTitle>
-            <Button onClick={exportCSV} className="bg-green-600 hover:bg-green-700 text-white border-0">
-              <Download className="w-4 h-4 mr-2" /> Exportar CSV
-            </Button>
-          </CardHeader>
-          <CardContent className="overflow-x-auto">
-            {registrants && (
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-white/10 hover:bg-transparent">
-                    <TableHead className="text-gray-400">Nome</TableHead>
-                    <TableHead className="text-gray-400">E-mail</TableHead>
-                    <TableHead className="text-gray-400">Telefone</TableHead>
-                    <TableHead className="text-gray-400">Cidade</TableHead>
-                    <TableHead className="text-gray-400">Profissão</TableHead>
-                    <TableHead className="text-gray-400">Minicursos</TableHead>
-                    <TableHead className="text-gray-400 text-right">Data</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {registrants.map((r: any) => (
-                    <TableRow key={r.id} className="border-white/10 hover:bg-white/5">
-                      <TableCell className="font-medium text-white">{r.name}</TableCell>
-                      <TableCell className="text-gray-300">{r.email}</TableCell>
-                      <TableCell className="text-gray-300">{r.phone}</TableCell>
-                      <TableCell className="text-gray-300">{r.city}</TableCell>
-                      <TableCell className="text-gray-300">{r.profession}</TableCell>
-                      <TableCell className="text-gray-300 text-sm max-w-[200px] truncate" title={r.minicourses.join(', ')}>
-                        {r.minicourses.length > 0 ? r.minicourses.join(', ') : '-'}
-                      </TableCell>
-                      <TableCell className="text-gray-400 text-right text-sm">
-                        {format(new Date(r.createdAt), 'dd/MM/yyyy HH:mm')}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {registrants.length === 0 && (
-                    <TableRow className="hover:bg-transparent">
-                      <TableCell colSpan={7} className="text-center text-gray-500 py-8">
-                        Nenhuma inscrição encontrada.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+        </main>
       </div>
+    </div>
+  );
+}
+
+function SettingsPanel({ onLogout }: { onLogout: () => void }) {
+  return (
+    <div className="space-y-6 max-w-lg">
+      <Card className="glass-panel border-white/10 bg-white/5">
+        <CardHeader>
+          <CardTitle className="text-white text-base">Sessão Administrativa</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-gray-400">
+            Você está autenticado como administrador do Conecta Orto.
+            A sessão expira após 8 horas de inatividade.
+          </p>
+          <p className="text-xs text-gray-500">
+            Para alterar a senha, atualize a variável de ambiente <code className="bg-black/30 px-1.5 py-0.5 rounded text-primary">ADMIN_PASSWORD</code> no painel da Replit.
+          </p>
+          <Button variant="outline" className="border-red-500/30 text-red-400 hover:text-red-300 mt-2" onClick={onLogout}>
+            <LogOut className="w-4 h-4 mr-2" /> Encerrar sessão
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="glass-panel border-white/10 bg-white/5">
+        <CardHeader>
+          <CardTitle className="text-white text-base">Informações do Sistema</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm text-gray-400">
+          <p>🗓️ Evento: <span className="text-white">09 de Julho de 2026</span></p>
+          <p>📍 Local: <span className="text-white">UnDF Jorge Amaury, Brasília — DF</span></p>
+          <p>🏛️ Universidade do Distrito Federal Professor Jorge Amaury Maia Nunes — UnDF</p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
