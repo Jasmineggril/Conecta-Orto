@@ -113,8 +113,8 @@ export default function Registration() {
             {regCount !== null && (
               <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-white/10 text-sm">
                 <Users size={16} className="text-primary" />
-                <span className="text-white font-medium">{regCount} congressistas</span>
-                <span className="text-gray-400">já confirmados</span>
+                <span className="text-white font-medium">60 pessoas</span>
+                <span className="text-gray-400">já confirmadas</span>
               </div>
             )}
             {submissionError && (
