@@ -46,17 +46,14 @@ export default function GuidedTour() {
     typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
 
-  // Show welcome popup on first visit
+  // Show welcome popup on every visit
   useEffect(() => {
-    if (!localStorage.getItem(STORAGE_KEY)) {
-      setTimeout(() => setShowWelcome(true), 1500);
-    }
+    setTimeout(() => setShowWelcome(true), 1500);
   }, []);
 
   const dismissAll = useCallback(() => {
     setShowWelcome(false);
     setActive(false);
-    localStorage.setItem(STORAGE_KEY, "1");
   }, []);
 
   const startTour = useCallback(() => {
