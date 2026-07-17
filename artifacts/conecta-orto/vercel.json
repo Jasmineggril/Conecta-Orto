@@ -1,6 +1,6 @@
 {
-  "buildCommand": "NODE_ENV=production pnpm run build",
-  "outputDirectory": "dist/public",
+  "buildCommand": "NODE_ENV=production pnpm --filter @workspace/conecta-orto run build",
+  "outputDirectory": "artifacts/conecta-orto/dist/public",
   "headers": [
     {
       "source": "/(.*)",
