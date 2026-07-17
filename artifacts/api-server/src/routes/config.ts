@@ -1,0 +1,13 @@
+import { Router } from "express";
+
+const router = Router();
+
+/* GET /config — public client-side config (safe to expose in frontend) */
+router.get("/config", (_req, res) => {
+  res.json({
+    supabaseUrl: process.env.SUPABASE_URL ?? "",
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY ?? "",
+  });
+});
+
+export default router;

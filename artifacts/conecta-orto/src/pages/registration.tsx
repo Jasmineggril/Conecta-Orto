@@ -20,6 +20,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Users } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useUser } from "@/lib/user-context";
+import { triggerSupabaseConfirmation } from "@/lib/supabase-auth";
 
 const registrationSchema = z.object({
   name: z.string().min(2, "Nome é obrigatório"),
@@ -88,9 +89,17 @@ export default function Registration() {
     setRegCount((current) => (current ?? 0) + 1);
     // Salva sessão do usuário
     if (data) setUser({ id: data.id, name: data.name, email: data.email });
+
+    // Dispara e-mail de confirmação via Supabase Auth (não bloqueia o fluxo)
+    triggerSupabaseConfirmation(
+      values.email,
+      values.name,
+      window.location.origin,
+    ).catch(console.error);
+
     toast({
-      title: "Inscrição realizada com sucesso!",
-      description: "Você já pode se matricular nos minicursos.",
+      title: "Inscrição realizada! Verifique seu e-mail.",
+      description: "Enviamos um link de confirmação para " + values.email + ". Confirme para garantir sua vaga.",
     });
     setLocation("/minicursos");
   };

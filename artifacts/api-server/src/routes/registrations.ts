@@ -139,6 +139,31 @@ router.get("/registrations/confirm/:token", async (req, res) => {
   return res.json({ success: true, name: reg?.name ?? "" });
 });
 
+/* POST /registrations/confirm-by-email — chamado após callback do Supabase Auth */
+router.post("/registrations/confirm-by-email", async (req, res) => {
+  const { email } = req.body as { email?: string };
+  if (!email) return res.status(400).json({ error: "E-mail obrigatório" });
+
+  const [reg] = await db
+    .select()
+    .from(registrationsTable)
+    .where(eq(registrationsTable.email, String(email).toLowerCase()))
+    .limit(1);
+
+  if (!reg) return res.status(404).json({ error: "Inscrição não encontrada" });
+
+  if (reg.emailConfirmed) {
+    return res.status(409).json({ message: "Já confirmado", name: reg.name });
+  }
+
+  await db
+    .update(registrationsTable)
+    .set({ emailConfirmed: true, emailConfirmedAt: new Date(), status: "confirmado", updatedAt: new Date() })
+    .where(eq(registrationsTable.id, reg.id));
+
+  return res.json({ success: true, name: reg.name });
+});
+
 /* POST /registrations/:id/resend-confirmation */
 router.post("/registrations/:id/resend-confirmation", async (req, res) => {
   const id = Number(req.params.id);

@@ -9,6 +9,7 @@ import homepageRouter from "./homepage";
 import sponsorsRouter from "./sponsors";
 import galleryRouter from "./gallery";
 import certificatesRouter from "./certificates";
+import configRouter from "./config";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(homepageRouter);
 router.use(sponsorsRouter);
 router.use(galleryRouter);
 router.use(certificatesRouter);
+router.use(configRouter);
 
 export default router;
