@@ -117,7 +117,7 @@ export default function Registration() {
         >
           <div className="text-center mb-10">
             <h1 className="text-4xl font-bold mb-4">Garanta sua Vaga</h1>
-            <p className="text-gray-400">Preencha os dados abaixo para se inscrever no Conecta Orto 2025.</p>
+            <p className="text-gray-400">Preencha os dados abaixo para se inscrever no Conecta Orto 2026.</p>
             
             {regCount !== null && (
               <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-white/10 text-sm">
