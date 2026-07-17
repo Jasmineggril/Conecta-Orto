@@ -1,0 +1,626 @@
+Cole este prompt diretamente no **Replit Agent**:
+
+```text
+Analise todo o projeto Conecta Orto antes de modificar qualquer arquivo.
+
+Não recrie o site do zero, não altere desnecessariamente a identidade visual e não remova funcionalidades existentes. Corrija e complete o sistema atual, mantendo React, TypeScript, Vite, Tailwind e Supabase, caso já estejam configurados.
+
+Quero que o site fique totalmente funcional, integrado ao banco de dados e pronto para apresentação ao professor.
+
+OBJETIVO PRINCIPAL
+
+Corrigir e implementar:
+
+1. Área administrativa protegida por senha;
+2. Administração de alunos;
+3. Administração de minicursos;
+4. Administração de certificados;
+5. Administração de palestrantes;
+6. Administração da galeria;
+7. Edição da página inicial;
+8. Administração de patrocinadores;
+9. Confirmação de cadastro por e-mail;
+10. Geração real de certificados em PDF;
+11. Correção de UDF para UnDF;
+12. Logo oficial da UnDF na área de patrocinadores.
+
+--------------------------------------------------
+1. ÁREA RESTRITA E LOGIN ADMINISTRATIVO
+--------------------------------------------------
+
+Corrija a página “Área Restrita”.
+
+Crie um login administrativo funcional com:
+
+- Campo para digitar a senha;
+- Senha inicial: 123456;
+- Botão “Entrar”;
+- Mensagem de erro para senha incorreta;
+- Botão “Sair”;
+- Sessão mantida ao atualizar a página;
+- Bloqueio das páginas administrativas sem autenticação;
+- Redirecionamento para o login caso alguém tente acessar diretamente o painel.
+
+Não deixe a senha visível ou validada somente no frontend.
+
+Configure a senha em variável de ambiente:
+
+ADMIN_PASSWORD=123456
+
+A validação deve acontecer no backend ou em uma função segura.
+
+--------------------------------------------------
+2. PAINEL ADMINISTRATIVO
+--------------------------------------------------
+
+Transforme a área administrativa em um painel completo.
+
+Crie um menu com:
+
+- Visão geral;
+- Alunos;
+- Minicursos;
+- Certificados;
+- Palestrantes;
+- Galeria;
+- Página inicial;
+- Patrocinadores;
+- Configurações.
+
+Na visão geral, mostrar:
+
+- Total de inscritos;
+- Inscrições confirmadas;
+- Inscrições pendentes;
+- Total de inscritos por minicurso;
+- Total de certificados liberados;
+- Total de palestrantes;
+- Inscrições recentes;
+- Número de vagas disponíveis em cada minicurso.
+
+Todas as informações devem vir do banco de dados.
+
+--------------------------------------------------
+3. ADMINISTRAÇÃO DOS ALUNOS
+--------------------------------------------------
+
+Na área “Alunos”, permitir:
+
+- Listar todos os participantes;
+- Pesquisar por nome ou e-mail;
+- Filtrar por cadastro confirmado ou pendente;
+- Visualizar os dados completos;
+- Editar os dados;
+- Excluir participante com confirmação;
+- Confirmar o cadastro manualmente;
+- Marcar presença no evento;
+- Marcar presença em minicursos;
+- Ver em quais minicursos o aluno está inscrito;
+- Adicionar ou remover o aluno de minicursos;
+- Reenviar o e-mail de confirmação;
+- Liberar ou bloquear certificados;
+- Exportar os participantes em CSV.
+
+Não permitir dois cadastros com o mesmo e-mail.
+
+Salvar no banco, no mínimo:
+
+- id;
+- nome;
+- email;
+- telefone;
+- profissão;
+- cidade;
+- email_confirmado;
+- data_confirmacao_email;
+- presenca_evento;
+- certificado_liberado;
+- status;
+- data_cadastro;
+- data_atualizacao.
+
+--------------------------------------------------
+4. CONFIRMAÇÃO DO CADASTRO POR E-MAIL
+--------------------------------------------------
+
+Depois do preenchimento do formulário de inscrição:
+
+1. Salvar o participante como “Pendente de confirmação”;
+2. Gerar um token único e seguro;
+3. Enviar um e-mail de confirmação;
+4. Inserir no e-mail um botão “Confirmar minha inscrição”;
+5. Criar uma página pública de confirmação;
+6. Validar o token quando o participante clicar;
+7. Marcar o e-mail como confirmado;
+8. Mostrar uma mensagem de sucesso;
+9. Impedir o uso de token expirado ou já utilizado;
+10. Permitir o reenvio do e-mail.
+
+Depois do cadastro, mostrar:
+
+“Cadastro realizado com sucesso. Enviamos um link de confirmação para o seu e-mail. Verifique também a caixa de spam.”
+
+O e-mail deve conter:
+
+- Nome do participante;
+- Nome do evento Conecta Orto;
+- Confirmação de recebimento do cadastro;
+- Botão para confirmar;
+- Aviso de que a inscrição só será válida após a confirmação;
+- Identidade visual do evento;
+- Nome da UnDF.
+
+Pode utilizar Supabase, Supabase Edge Functions ou Resend.
+
+Utilizar variáveis de ambiente:
+
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+RESEND_API_KEY=
+APP_URL=
+
+Nunca colocar chaves secretas diretamente no frontend.
+
+--------------------------------------------------
+5. ADMINISTRAÇÃO DOS MINICURSOS
+--------------------------------------------------
+
+Na área “Minicursos”, permitir:
+
+- Criar minicurso;
+- Editar minicurso;
+- Excluir minicurso;
+- Ativar ou desativar minicurso;
+- Alterar título;
+- Alterar descrição;
+- Alterar professor;
+- Alterar data;
+- Alterar horário;
+- Alterar duração;
+- Alterar local;
+- Alterar carga horária;
+- Alterar número máximo de vagas;
+- Encerrar inscrições;
+- Visualizar inscritos;
+- Marcar presença;
+- Exportar lista de inscritos;
+- Definir se o minicurso gera certificado.
+
+A página pública de minicursos deve carregar os dados diretamente do banco.
+
+Não deixar os minicursos escritos apenas de forma fixa no código.
+
+Quando não houver vagas:
+
+- Mostrar “Vagas esgotadas”;
+- Desativar o botão de inscrição;
+- Bloquear novas inscrições também no backend.
+
+Somente participantes cadastrados e com e-mail confirmado poderão se inscrever em minicursos.
+
+--------------------------------------------------
+6. ADMINISTRAÇÃO DOS PALESTRANTES
+--------------------------------------------------
+
+Na área “Palestrantes”, permitir:
+
+- Cadastrar palestrante;
+- Editar;
+- Excluir;
+- Ativar ou desativar;
+- Adicionar foto;
+- Nome;
+- Cargo;
+- Instituição;
+- Biografia;
+- Tema da palestra;
+- Data;
+- Horário;
+- LinkedIn ou link profissional;
+- Ordem de exibição.
+
+A página pública deve mostrar os dados cadastrados no painel.
+
+--------------------------------------------------
+7. ADMINISTRAÇÃO DA GALERIA
+--------------------------------------------------
+
+Na área “Galeria”, permitir:
+
+- Enviar imagens;
+- Inserir título;
+- Inserir legenda;
+- Inserir texto alternativo;
+- Escolher categoria;
+- Alterar ordem;
+- Ativar ou ocultar imagem;
+- Excluir imagem;
+- Visualizar prévia.
+
+Utilizar Supabase Storage para armazenar as imagens.
+
+Validar:
+
+- Tipo do arquivo;
+- Tamanho máximo;
+- Extensões permitidas;
+- Erros de envio.
+
+Manter a galeria responsiva.
+
+--------------------------------------------------
+8. EDIÇÃO DA PÁGINA INICIAL
+--------------------------------------------------
+
+Na área “Página inicial”, permitir modificar:
+
+- Título principal;
+- Subtítulo;
+- Texto de apresentação;
+- Vídeo;
+- Imagem principal;
+- Data;
+- Horário;
+- Local;
+- Programação;
+- Botões principais;
+- Informações de contato;
+- Avisos;
+- Status das inscrições;
+- Texto institucional.
+
+Salvar todo o conteúdo no banco.
+
+A página inicial pública deve carregar essas informações automaticamente.
+
+Não substituir o design atual por um layout genérico.
+
+--------------------------------------------------
+9. PATROCINADORES E CORREÇÃO DA UNDF
+--------------------------------------------------
+
+Procure em todo o projeto ocorrências de “UDF”.
+
+Quando estiver se referindo à universidade do projeto, corrigir para:
+
+UnDF
+
+Usar o nome correto:
+
+Universidade do Distrito Federal Professor Jorge Amaury Maia Nunes — UnDF
+
+Na página de patrocinadores:
+
+- Criar um destaque para “Patrocinador Oficial” ou “Apoio Institucional Oficial”;
+- Colocar a logo oficial da UnDF;
+- Não distorcer a logo;
+- Manter a proporção original;
+- Garantir boa visualização em celular e computador;
+- Adicionar texto alternativo;
+- Permitir administrar patrocinadores pelo painel.
+
+No painel, permitir:
+
+- Adicionar patrocinador;
+- Editar;
+- Excluir;
+- Ativar ou desativar;
+- Nome;
+- Logo;
+- Site;
+- Categoria;
+- Ordem de exibição.
+
+Não inventar uma nova logo da UnDF. Utilizar o arquivo oficial existente no projeto ou preparar um campo para upload.
+
+--------------------------------------------------
+10. CERTIFICADOS EM PDF
+--------------------------------------------------
+
+Corrija totalmente a função de certificados.
+
+O botão “Baixar PDF” deve baixar um arquivo PDF real.
+
+Não usar somente window.print ou a tela de impressão do navegador.
+
+Utilize uma biblioteca adequada, como:
+
+- jsPDF;
+- pdf-lib;
+- html2canvas com jsPDF;
+- ou geração do PDF no backend.
+
+O certificado deve:
+
+- Ser horizontal;
+- Ter boa resolução;
+- Não cortar textos;
+- Não cortar logos;
+- Funcionar no celular e no computador;
+- Baixar diretamente como arquivo .pdf;
+- Ter layout profissional.
+
+Nome do arquivo:
+
+certificado-conecta-orto-nome-do-participante.pdf
+
+O certificado deve conter:
+
+- Nome completo do participante;
+- Nome Conecta Orto;
+- Tipo do certificado;
+- Nome do minicurso, quando aplicável;
+- Data;
+- Local;
+- Carga horária;
+- Logo do evento;
+- Logo da UnDF;
+- Código único de validação;
+- QR Code;
+- Data de emissão.
+
+--------------------------------------------------
+11. REGRAS DOS CERTIFICADOS
+--------------------------------------------------
+
+Não liberar certificado apenas porque a pessoa se cadastrou.
+
+Certificado de participação no evento:
+
+- E-mail confirmado;
+- Presença no evento confirmada;
+- Certificado liberado pelo administrador.
+
+Certificado de minicurso:
+
+- E-mail confirmado;
+- Participante inscrito no minicurso;
+- Presença no minicurso confirmada;
+- Minicurso configurado para emitir certificado;
+- Certificado liberado.
+
+Quando o certificado não estiver disponível, informar o motivo:
+
+- Cadastro ainda não confirmado;
+- Presença ainda não registrada;
+- Certificado ainda não liberado;
+- Participante não inscrito;
+- Certificado não encontrado.
+
+--------------------------------------------------
+12. CONSULTA DOS CERTIFICADOS
+--------------------------------------------------
+
+Manter a consulta de certificados pelo e-mail do participante.
+
+Depois que o participante pesquisar o e-mail:
+
+- Mostrar o certificado do evento;
+- Mostrar certificados dos minicursos;
+- Mostrar o status;
+- Permitir baixar cada certificado;
+- Não exibir dados pessoais desnecessários.
+
+Criar uma rota pública para validação:
+
+/certificados/validar/:codigo
+
+A página deve mostrar:
+
+- Certificado válido ou inválido;
+- Nome do participante;
+- Nome do evento ou minicurso;
+- Data de emissão;
+- Código de autenticidade;
+- Status ativo ou cancelado.
+
+O QR Code deve apontar para essa página.
+
+Criar uma tabela de certificados contendo:
+
+- id;
+- participante_id;
+- minicurso_id;
+- tipo_certificado;
+- codigo_validacao;
+- data_emissao;
+- status;
+- carga_horaria;
+- data_cancelamento.
+
+Cada certificado deve possuir um código único e não previsível.
+
+--------------------------------------------------
+13. BANCO DE DADOS
+--------------------------------------------------
+
+Criar ou corrigir as tabelas necessárias para:
+
+- Participantes;
+- Tokens de confirmação;
+- Minicursos;
+- Inscrições em minicursos;
+- Presenças;
+- Palestrantes;
+- Galeria;
+- Conteúdo da página inicial;
+- Patrocinadores;
+- Certificados;
+- Configurações.
+
+Não criar bancos paralelos.
+
+Antes de alterar, analise se o projeto usa Supabase diretamente, API Express ou Drizzle.
+
+Escolha uma fonte principal de dados e mantenha todo o sistema consistente.
+
+Preferência:
+
+- Supabase/PostgreSQL como banco principal;
+- Operações administrativas protegidas;
+- Frontend consumindo dados públicos;
+- Backend ou Edge Functions para ações sensíveis.
+
+--------------------------------------------------
+14. SEGURANÇA
+--------------------------------------------------
+
+Revisar ou criar políticas de segurança no Supabase.
+
+Usuários públicos podem:
+
+- Criar cadastro;
+- Confirmar cadastro;
+- Consultar minicursos ativos;
+- Consultar palestrantes;
+- Consultar patrocinadores;
+- Consultar conteúdo público;
+- Buscar os próprios certificados.
+
+Usuários públicos não podem:
+
+- Listar todos os participantes;
+- Alterar presença;
+- Editar outros participantes;
+- Gerenciar minicursos;
+- Gerenciar certificados;
+- Editar a página inicial;
+- Gerenciar patrocinadores;
+- Acessar chaves administrativas.
+
+Somente o administrador autenticado poderá acessar funções administrativas.
+
+--------------------------------------------------
+15. EXPERIÊNCIA DO USUÁRIO
+--------------------------------------------------
+
+Corrigir:
+
+- Erros de português;
+- Botões sem funcionamento;
+- Links quebrados;
+- Campos sem validação;
+- Mensagens de erro;
+- Mensagens de sucesso;
+- Responsividade;
+- Estados de carregamento;
+- Páginas vazias;
+- Imagens quebradas;
+- Textos cortados;
+- Contraste;
+- Navegação;
+- Acessibilidade;
+- Textos alternativos nas imagens.
+
+Manter a identidade visual atual do Conecta Orto.
+
+Não transformar o site em um template genérico.
+
+--------------------------------------------------
+16. TESTES OBRIGATÓRIOS
+--------------------------------------------------
+
+Antes de finalizar:
+
+1. Executar a verificação do TypeScript;
+2. Executar o build de produção;
+3. Corrigir todos os erros;
+4. Testar o login com a senha 123456;
+5. Testar a proteção do painel;
+6. Testar cadastro de participante;
+7. Testar confirmação por e-mail;
+8. Testar edição de participante;
+9. Testar inscrição em minicurso;
+10. Testar limite de vagas;
+11. Testar presença;
+12. Testar criação de palestrante;
+13. Testar upload de imagem;
+14. Testar edição da página inicial;
+15. Testar patrocinadores;
+16. Testar geração do PDF;
+17. Testar download do PDF;
+18. Testar QR Code;
+19. Testar validação pública do certificado;
+20. Testar o site em desktop e celular.
+
+Não considere a tarefa concluída enquanto existirem erros de build ou botões sem funcionamento.
+
+--------------------------------------------------
+17. DOCUMENTAÇÃO
+--------------------------------------------------
+
+Atualize o README com:
+
+- Tecnologias;
+- Arquitetura;
+- Estrutura do banco;
+- Tabelas e relacionamentos;
+- Variáveis de ambiente;
+- Como executar;
+- Como configurar Supabase;
+- Como configurar envio de e-mail;
+- Como alterar a senha administrativa;
+- Como fazer deploy;
+- Como funciona a confirmação de cadastro;
+- Como funciona a emissão dos certificados.
+
+Crie também o arquivo:
+
+IMPLEMENTATION_REPORT.md
+
+Nesse arquivo, informar:
+
+- Arquivos modificados;
+- Funcionalidades implementadas;
+- Tabelas criadas;
+- Decisões técnicas;
+- Testes realizados;
+- Erros corrigidos;
+- Configurações que ainda dependem de ação manual.
+
+--------------------------------------------------
+18. CRITÉRIOS FINAIS DE ACEITE
+--------------------------------------------------
+
+A tarefa somente estará concluída quando:
+
+- A senha 123456 funcionar;
+- O painel estiver protegido;
+- O administrador puder gerenciar alunos;
+- O administrador puder gerenciar minicursos;
+- O administrador puder gerenciar certificados;
+- O administrador puder gerenciar palestrantes;
+- O administrador puder gerenciar a galeria;
+- O administrador puder editar a página inicial;
+- O administrador puder gerenciar patrocinadores;
+- UDF tiver sido corrigido para UnDF;
+- A logo oficial da UnDF aparecer corretamente;
+- O cadastro for salvo no banco;
+- O participante receber o e-mail de confirmação;
+- O link confirmar o cadastro;
+- O PDF for gerado de verdade;
+- O PDF puder ser baixado;
+- O certificado tiver código e QR Code;
+- O certificado puder ser validado;
+- O banco persistir as informações;
+- O site estiver responsivo;
+- O build terminar sem erros.
+
+Primeiro, faça uma análise da estrutura atual do projeto.
+
+Depois, apresente um plano curto de implementação.
+
+Em seguida, faça as alterações por etapas, verificando o funcionamento depois de cada etapa.
+
+Não apenas explique o que precisa ser feito. Implemente as correções diretamente nos arquivos do projeto.
+
+Ao finalizar, apresente:
+
+1. Resumo das alterações;
+2. Arquivos modificados;
+3. Funcionalidades implementadas;
+4. Testes executados;
+5. Variáveis de ambiente necessárias;
+6. Configurações manuais pendentes.
+```

@@ -1,0 +1,157 @@
+Adicione este trecho ao final do prompt do Replit:
+
+```text
+--------------------------------------------------
+19. TOUR GUIADO, POP-UPS E DESTAQUES VISUAIS
+--------------------------------------------------
+
+Adicionar um tour guiado interativo para explicar o funcionamento do site aos usuários.
+
+O tour deve aparecer na primeira visita ao site e ensinar, de forma simples, onde clicar e como usar as principais funcionalidades.
+
+Criar pop-ups explicativos com destaque visual, luzes suaves, setas e foco no elemento indicado.
+
+O tour deve explicar, nesta ordem:
+
+1. Onde conhecer o evento;
+2. Onde clicar para se inscrever;
+3. Como preencher o formulário;
+4. Onde visualizar os minicursos;
+5. Como se inscrever em um minicurso;
+6. Onde consultar certificados;
+7. Como buscar certificado pelo e-mail;
+8. Onde visualizar palestrantes;
+9. Onde acessar a galeria;
+10. Onde encontrar contato e informações do evento.
+
+Requisitos do tour:
+
+- Escurecer levemente o restante da tela;
+- Destacar o elemento atual com borda luminosa suave;
+- Utilizar animação discreta de pulso;
+- Mostrar uma seta apontando para o botão ou área explicada;
+- Exibir título e texto curto;
+- Ter botões “Voltar”, “Próximo” e “Pular tour”;
+- Exibir progresso, por exemplo: “Etapa 2 de 8”;
+- Ter botão “Concluir” na última etapa;
+- Funcionar em desktop e celular;
+- Adaptar automaticamente a posição do pop-up;
+- Não esconder o elemento destacado;
+- Permitir fechar o tour a qualquer momento;
+- Não abrir novamente em todas as visitas após ser concluído;
+- Salvar no localStorage que o usuário já concluiu ou pulou o tour;
+- Criar um botão “Ver tutorial novamente” no menu ou rodapé;
+- Garantir navegação por teclado;
+- Permitir fechar com a tecla Esc;
+- Usar textos em português do Brasil;
+- Não usar efeitos exagerados ou piscantes;
+- Não prejudicar a acessibilidade.
+
+Pode utilizar uma biblioteca como:
+
+- driver.js;
+- react-joyride;
+- intro.js;
+
+Escolha a opção mais compatível com o projeto atual.
+
+Exemplo de textos:
+
+ETAPA 1 — BEM-VINDO
+
+Título:
+“Bem-vindo ao Conecta Orto!”
+
+Texto:
+“Este tutorial rápido vai mostrar como se inscrever no evento, escolher minicursos e consultar seus certificados.”
+
+ETAPA 2 — INSCRIÇÃO
+
+Título:
+“Faça sua inscrição”
+
+Texto:
+“Clique aqui para realizar sua inscrição no Conecta Orto. Você receberá um e-mail para confirmar o cadastro.”
+
+Destacar o botão:
+“Inscrever-se no Evento”
+
+ETAPA 3 — MINICURSOS
+
+Título:
+“Escolha seus minicursos”
+
+Texto:
+“Depois de confirmar seu cadastro, acesse esta área para conhecer os minicursos disponíveis e garantir sua vaga.”
+
+Destacar o botão:
+“Minicursos”
+
+ETAPA 4 — CERTIFICADOS
+
+Título:
+“Consulte seus certificados”
+
+Texto:
+“Após a confirmação da presença e a liberação pela organização, pesquise seu e-mail para baixar seus certificados em PDF.”
+
+Destacar o botão:
+“Certificados”
+
+ETAPA 5 — PALESTRANTES
+
+Título:
+“Conheça os palestrantes”
+
+Texto:
+“Veja quem participará do evento, os temas apresentados e os horários das palestras.”
+
+ETAPA 6 — GALERIA
+
+Título:
+“Explore a galeria”
+
+Texto:
+“Confira imagens do evento, das atividades e dos minicursos.”
+
+ETAPA 7 — FINALIZAÇÃO
+
+Título:
+“Tudo pronto!”
+
+Texto:
+“Agora você já sabe como navegar no Conecta Orto. Faça sua inscrição e aproveite o evento.”
+
+Adicionar também pequenos destaques visuais nos botões principais:
+
+- “Inscrever-se no Evento”;
+- “Minicursos”;
+- “Certificados”.
+
+Esses destaques podem usar:
+
+- Brilho suave;
+- Animação de pulso leve;
+- Pequeno ícone de ajuda;
+- Tooltip ao passar o mouse;
+- Balão informativo na primeira visita.
+
+Não utilizar luzes fortes, piscantes ou animações cansativas.
+
+Criar uma preferência para reduzir animações quando o sistema do usuário estiver configurado com “prefers-reduced-motion”.
+
+Também adicionar um pop-up inicial de boas-vindas com:
+
+Título:
+“Bem-vindo ao Conecta Orto”
+
+Texto:
+“Inscreva-se no evento, escolha seus minicursos e consulte seus certificados em um só lugar.”
+
+Botões:
+
+- “Começar tutorial”;
+- “Explorar sozinho”.
+
+Esse pop-up deve aparecer apenas na primeira visita, salvo se o usuário clicar em “Ver tutorial novamente”.
+```

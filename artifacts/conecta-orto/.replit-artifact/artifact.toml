@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Conecta Orto"
+version = "1.0.0"
+id = "artifacts/conecta-orto"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23026
+
+[services.development]
+run = "pnpm --filter @workspace/conecta-orto run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/conecta-orto", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/conecta-orto/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23026"
+BASE_PATH = "/"
