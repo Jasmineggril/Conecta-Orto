@@ -1,0 +1,13 @@
+{
+  "buildCommand": "NODE_ENV=production pnpm run build",
+  "outputDirectory": "dist/public",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }]
+    }
+  ],
+  "rewrites": [
+    { "source": "/((?!assets|favicon|robots|videos|planta).*)", "destination": "/index.html" }
+  ]
+}
