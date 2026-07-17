@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm install && NODE_ENV=production pnpm --filter @workspace/conecta-orto run build",
+  "buildCommand": "cd artifacts/conecta-orto && pnpm install && NODE_ENV=production pnpm run build",
   "outputDirectory": "artifacts/conecta-orto/dist/public",
   "headers": [
     {
