@@ -1,6 +1,6 @@
 {
-  "buildCommand": "pnpm install && pnpm run build",
-  "outputDirectory": "artifacts/conecta-orto/dist",
+  "buildCommand": "pnpm install && NODE_ENV=production pnpm --filter @workspace/conecta-orto exec vite build",
+  "outputDirectory": "artifacts/conecta-orto/dist/public",
   "headers": [
     {
       "source": "/(.*)",
@@ -8,7 +8,6 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/((?!assets|favicon|robots|videos|planta).*)", "destination": "/index.html" }
   ]
 }
