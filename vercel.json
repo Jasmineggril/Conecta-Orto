@@ -8,10 +8,9 @@
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }]
     }
   ],
-  "rewrites": [
-    {
-      "source": "/((?!assets|favicon|robots|videos|planta).*)",
-      "destination": "/index.html"
-    }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/handler" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
