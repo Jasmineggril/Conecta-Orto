@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { supabase } from "@/lib/supabase";
+import { api } from "@/lib/api";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -9,19 +9,31 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Clock, User, Users, FlaskConical, BookOpen, Wrench, Monitor, HeartPulse, CheckCircle2 } from "lucide-react";
+import { Clock, User, Users, FlaskConical, BookOpen, Wrench, Monitor, HeartPulse, CheckCircle2, RefreshCw } from "lucide-react";
 import { useUser } from "@/lib/user-context";
 
 interface MinicourseItem {
   id: number;
   title: string;
   instructor: string;
+  description: string;
   duration: string;
   type: string;
-  capacity: number;
-  created_at: string;
-  enrollment_count: number;
+  maxCapacity: number;
+  enrollmentCount: number;
+  enrollmentsClosed: boolean;
+  date: string;
+  time: string;
+  location: string;
 }
+
+const TYPE_MAP: Record<string, { label: string; color: string; Icon: any }> = {
+  teoria:      { label: "Teórico",    color: "bg-blue-500/15 text-blue-300 border-blue-500/30",         Icon: BookOpen },
+  pratico:     { label: "Prático",    color: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", Icon: Wrench },
+  tecnologia:  { label: "Tecnologia", color: "bg-violet-500/15 text-violet-300 border-violet-500/30",   Icon: Monitor },
+  clinico:     { label: "Clínico",    color: "bg-pink-500/15 text-pink-300 border-pink-500/30",         Icon: HeartPulse },
+  laboratorio: { label: "Lab",        color: "bg-amber-500/15 text-amber-300 border-amber-500/30",      Icon: FlaskConical },
+};
 
 export default function Minicourses() {
   const { toast } = useToast();
@@ -40,7 +52,36 @@ export default function Minicourses() {
   const [isEnrollmentPending, setIsEnrollmentPending] = useState(false);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState<Set<number>>(new Set());
 
-  // Abre o modal — se o usuário já estiver logado, pula direto para confirmação
+  async function loadMinicourses() {
+    setIsLoading(true);
+    setLoadError(null);
+    try {
+      const data = await api.get<MinicourseItem[]>("/minicourses");
+      setMinicourses(data);
+    } catch (err: any) {
+      console.error(err);
+      setLoadError(err?.message ?? "Erro ao carregar minicursos. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function loadUserEnrollments(userId: number) {
+    try {
+      const reg = await api.get<{ enrollments: { minicourseId: number }[] }>(`/registrations/by-id/${userId}`);
+      if (reg?.enrollments) {
+        setEnrolledCourseIds(new Set(reg.enrollments.map((e) => e.minicourseId)));
+      }
+    } catch {
+      // silently ignore — not critical
+    }
+  }
+
+  useEffect(() => {
+    loadMinicourses();
+    if (user?.id) loadUserEnrollments(user.id);
+  }, [user?.id]);
+
   const handleEnrollClick = (courseId: number) => {
     setSelectedCourseId(courseId);
     setEnrollmentError(null);
@@ -62,105 +103,42 @@ export default function Minicourses() {
       toast({ variant: "destructive", title: "Erro", description: "Informe seu e-mail." });
       return;
     }
-
     setIsLookupPending(true);
-
-    const { data, error } = await supabase
-      .from("registrations")
-      .select("id, name")
-      .eq("email", email)
-      .single();
-
-    setIsLookupPending(false);
-
-    if (error) {
-      console.error(error);
-      const message = "Você precisa se inscrever no evento primeiro.";
+    try {
+      const reg = await api.post<{ id: number; name: string }>("/registrations/lookup", { email });
+      setRegistrationId(reg.id);
+      setRegistrationName(reg.name);
+      setModalStep("confirm");
+      setUser({ id: reg.id, name: reg.name, email });
+    } catch (err: any) {
+      const message = err?.message ?? "Você precisa se inscrever no evento primeiro.";
       setEnrollmentError(message);
       toast({ variant: "destructive", title: "Cadastro não encontrado", description: message });
-      return;
+    } finally {
+      setIsLookupPending(false);
     }
-
-    setRegistrationId(data.id);
-    setRegistrationName(data.name);
-    setModalStep("confirm");
-    // Salva sessão do usuário
-    setUser({ id: data.id, name: data.name, email });
   };
 
   const handleConfirmEnrollment = async () => {
     if (!selectedCourseId || !registrationId) return;
     setIsEnrollmentPending(true);
-
-    const { error } = await supabase
-      .from("enrollments")
-      .insert({ registration_id: registrationId, minicourse_id: selectedCourseId });
-
-    setIsEnrollmentPending(false);
-
-    if (error) {
-      console.error(error);
-      const message = error.message || "Erro ao realizar matrícula.";
+    try {
+      await api.post("/enrollments", { registrationId, minicourseId: selectedCourseId });
+      toast({ title: "Matrícula confirmada!", description: "Você foi matriculado com sucesso." });
+      setEnrolledCourseIds((prev) => new Set(prev).add(selectedCourseId));
+      setSelectedCourseId(null);
+      setEmail("");
+      setRegistrationId(null);
+      setRegistrationName("");
+      await loadMinicourses();
+    } catch (err: any) {
+      const message = err?.message ?? "Erro ao realizar matrícula.";
       setEnrollmentError(message);
       toast({ variant: "destructive", title: "Erro na matrícula", description: message });
-      return;
+    } finally {
+      setIsEnrollmentPending(false);
     }
-
-    toast({ title: "Matrícula confirmada!", description: "Você foi matriculado no minicurso com sucesso." });
-    // Mark this course as enrolled in the current session
-    setEnrolledCourseIds((prev) => new Set(prev).add(selectedCourseId));
-    setSelectedCourseId(null);
-    setEmail("");
-    setRegistrationId(null);
-    setRegistrationName("");
-    await loadMinicourses();
   };
-
-  async function loadMinicourses() {
-    setIsLoading(true);
-    setLoadError(null);
-
-    const { data, error } = await supabase
-      .from("minicourses")
-      .select("*, enrollments(minicourse_id)");
-
-    if (error) {
-      console.error(error);
-      setLoadError(error.message || "Erro ao carregar minicursos.");
-      setIsLoading(false);
-      return;
-    }
-
-    const courses: MinicourseItem[] = (data ?? []).map((item: any) => ({
-      id: item.id,
-      title: item.title,
-      instructor: item.instructor,
-      duration: item.duration,
-      type: item.type ?? "pratico",
-      capacity: item.max_capacity ?? item.maxCapacity ?? 200,
-      created_at: item.created_at,
-      enrollment_count: item.enrollments?.length ?? 0,
-    }));
-
-    setMinicourses(courses);
-    setIsLoading(false);
-  }
-
-  // Carrega inscrições existentes do usuário logado
-  useEffect(() => {
-    async function loadUserEnrollments() {
-      if (!user) return;
-      const { data, error } = await supabase
-        .from("enrollments")
-        .select("minicourse_id")
-        .eq("registration_id", user.id);
-      if (!error && data) {
-        setEnrolledCourseIds(new Set(data.map((e: any) => e.minicourse_id)));
-      }
-    }
-    loadMinicourses();
-    loadUserEnrollments();
-  }, [user?.id]);
 
   return (
     <div className="min-h-screen bg-[#0A1628] py-12 relative">
@@ -177,25 +155,25 @@ export default function Minicourses() {
         </motion.div>
 
         {isLoading ? (
-          <div className="flex justify-center"><div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" /></div>
+          <div className="flex flex-col items-center gap-4 py-20">
+            <div className="w-10 h-10 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+            <p className="text-gray-400 text-sm">Carregando minicursos...</p>
+          </div>
         ) : loadError ? (
-          <div className="max-w-2xl mx-auto rounded-2xl bg-red-500/10 border border-red-500/20 p-6 text-center text-red-100">
-            <p className="font-semibold mb-2">Erro ao carregar minicursos</p>
-            <p>{loadError}</p>
+          <div className="max-w-2xl mx-auto rounded-2xl bg-red-500/10 border border-red-500/20 p-8 text-center text-red-100">
+            <p className="font-semibold text-lg mb-2">Erro ao carregar minicursos</p>
+            <p className="text-sm text-red-300 mb-6">{loadError}</p>
+            <Button variant="outline" onClick={loadMinicourses} className="gap-2 border-red-500/30 text-red-300 hover:bg-red-500/10">
+              <RefreshCw className="w-4 h-4" /> Tentar novamente
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {minicourses?.map((course) => {
-              const percentage = course.capacity ? Math.round((course.enrollment_count / course.capacity) * 100) : 0;
-              const isFull = course.enrollment_count >= course.capacity;
-              const TYPE_MAP: Record<string, { label: string; color: string; Icon: any }> = {
-                teoria:      { label: "Teórico",    color: "bg-blue-500/15 text-blue-300 border-blue-500/30",    Icon: BookOpen },
-                pratico:     { label: "Prático",    color: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", Icon: Wrench },
-                tecnologia:  { label: "Tecnologia", color: "bg-violet-500/15 text-violet-300 border-violet-500/30",  Icon: Monitor },
-                clinico:     { label: "Clínico",    color: "bg-pink-500/15 text-pink-300 border-pink-500/30",       Icon: HeartPulse },
-                laboratorio: { label: "Lab",        color: "bg-amber-500/15 text-amber-300 border-amber-500/30",    Icon: FlaskConical },
-              };
+            {minicourses.map((course) => {
+              const percentage = course.maxCapacity ? Math.round((course.enrollmentCount / course.maxCapacity) * 100) : 0;
+              const isFull = course.enrollmentCount >= course.maxCapacity || course.enrollmentsClosed;
               const typeInfo = TYPE_MAP[course.type] ?? TYPE_MAP["pratico"];
+              const isEnrolled = enrolledCourseIds.has(course.id);
 
               return (
                 <motion.div
@@ -211,47 +189,61 @@ export default function Minicourses() {
                           <typeInfo.Icon className="w-3 h-3 mr-1" />
                           {typeInfo.label}
                         </Badge>
-                        <Badge variant={isFull ? "destructive" : "outline"} className={!isFull ? "border-emerald-500/40 text-emerald-400 text-xs" : "text-xs"}>
+                        <Badge
+                          variant={isFull ? "destructive" : "outline"}
+                          className={!isFull ? "border-emerald-500/40 text-emerald-400 text-xs" : "text-xs"}
+                        >
                           {isFull ? "Esgotado" : "Vagas Abertas"}
                         </Badge>
                       </div>
                       <CardTitle className="text-xl text-white leading-snug">{course.title}</CardTitle>
                       <CardDescription className="text-gray-400 mt-2 line-clamp-3">
-                        Instrutor: {course.instructor}
+                        {course.description}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="flex-grow">
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         <div className="flex items-center text-sm text-gray-300">
-                          <User className="w-4 h-4 mr-2 text-primary" />
+                          <User className="w-4 h-4 mr-2 text-primary shrink-0" />
                           <span>Instrutor: <strong>{course.instructor}</strong></span>
                         </div>
                         <div className="flex items-center text-sm text-gray-300">
-                          <Clock className="w-4 h-4 mr-2 text-primary" />
+                          <Clock className="w-4 h-4 mr-2 text-primary shrink-0" />
                           <span>Duração: {course.duration}</span>
                         </div>
-                        
-                        <div className="pt-4 mt-4 border-t border-white/10">
+                        {course.date && (
+                          <div className="flex items-center text-sm text-gray-300">
+                            <span className="w-4 h-4 mr-2 text-primary text-center shrink-0">📅</span>
+                            <span>{course.date}{course.time ? ` — ${course.time}` : ""}</span>
+                          </div>
+                        )}
+                        {course.location && (
+                          <div className="flex items-center text-sm text-gray-300">
+                            <span className="w-4 h-4 mr-2 text-primary text-center shrink-0">📍</span>
+                            <span>{course.location}</span>
+                          </div>
+                        )}
+                        <div className="pt-3 mt-3 border-t border-white/10">
                           <div className="flex justify-between text-sm mb-2">
-                            <span className="text-gray-400 flex items-center gap-1"><Users className="w-4 h-4" /> Vagas preenchidas</span>
-                            <span className="font-medium text-white">{course.enrollment_count} / {course.capacity}</span>
+                            <span className="text-gray-400 flex items-center gap-1">
+                              <Users className="w-4 h-4" /> Vagas preenchidas
+                            </span>
+                            <span className="font-medium text-white">
+                              {course.enrollmentCount} / {course.maxCapacity}
+                            </span>
                           </div>
                           <Progress value={percentage} className="h-2 bg-black/40" />
                         </div>
                       </div>
                     </CardContent>
                     <CardFooter>
-                      <Button 
-                        className="w-full" 
-                        disabled={isFull || enrolledCourseIds.has(course.id)}
+                      <Button
+                        className="w-full"
+                        disabled={isFull || isEnrolled}
                         onClick={() => handleEnrollClick(course.id)}
-                        variant={enrolledCourseIds.has(course.id) ? "outline" : "default"}
+                        variant={isEnrolled ? "outline" : "default"}
                       >
-                        {enrolledCourseIds.has(course.id)
-                          ? "✓ Inscrito"
-                          : isFull
-                          ? "Lista de Espera"
-                          : "Garantir Vaga"}
+                        {isEnrolled ? "✓ Inscrito" : isFull ? "Esgotado" : "Garantir Vaga"}
                       </Button>
                     </CardFooter>
                   </Card>
@@ -267,28 +259,33 @@ export default function Minicourses() {
             <DialogHeader>
               <DialogTitle className="text-2xl">Matrícula no Minicurso</DialogTitle>
               <DialogDescription className="text-gray-400">
-                {modalStep === "email" ? "Identifique-se com o e-mail usado na inscrição do congresso." : "Confirme sua matrícula."}
+                {modalStep === "email"
+                  ? "Identifique-se com o e-mail usado na inscrição do congresso."
+                  : "Confirme sua matrícula."}
               </DialogDescription>
             </DialogHeader>
+
+            {enrollmentError && (
+              <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-300">
+                {enrollmentError}
+              </div>
+            )}
 
             {modalStep === "email" ? (
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-gray-300">Seu E-mail</Label>
-                  <Input 
-                    id="email" 
-                    type="email" 
+                  <Input
+                    id="email"
+                    type="email"
                     placeholder="joao@exemplo.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleLookup()}
                     className="bg-black/20 border-white/10 text-white"
                   />
                 </div>
-                <Button 
-                  className="w-full" 
-                  onClick={handleLookup}
-                  disabled={isLookupPending}
-                >
+                <Button className="w-full" onClick={handleLookup} disabled={isLookupPending}>
                   {isLookupPending ? "Buscando..." : "Continuar"}
                 </Button>
               </div>
@@ -302,11 +299,7 @@ export default function Minicourses() {
                   <CheckCircle2 size={14} className="text-emerald-400" />
                   Você pode se inscrever em quantos minicursos quiser!
                 </p>
-                <Button 
-                  className="w-full" 
-                  onClick={handleConfirmEnrollment}
-                  disabled={isEnrollmentPending}
-                >
+                <Button className="w-full" onClick={handleConfirmEnrollment} disabled={isEnrollmentPending}>
                   {isEnrollmentPending ? "Confirmando..." : "Confirmar Matrícula"}
                 </Button>
               </div>

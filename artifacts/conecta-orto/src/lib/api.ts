@@ -1,6 +1,6 @@
 /**
  * Minimal typed API client for direct REST calls to /api.
- * Used by admin components and new public pages.
+ * Used by admin components and all public pages.
  */
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "") + "/api";
@@ -15,23 +15,38 @@ function authHeaders(): Record<string, string> {
 }
 
 async function request<T>(path: string, opts?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...opts,
-    headers: {
-      "Content-Type": "application/json",
-      ...authHeaders(),
-      ...(opts?.headers ?? {}),
-    },
-  });
-  if (!res.ok) {
-    let msg = "Erro na requisição";
-    try {
-      const err = await res.json();
-      msg = err.error ?? msg;
-    } catch {}
-    throw new Error(msg);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000); // 12s timeout
+
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      ...opts,
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeaders(),
+        ...(opts?.headers ?? {}),
+      },
+    });
+
+    if (!res.ok) {
+      let msg = "Erro na requisição";
+      try {
+        const err = await res.json();
+        msg = err.error ?? msg;
+      } catch {}
+      throw new Error(msg);
+    }
+
+    return res.json() as Promise<T>;
+  } catch (err: any) {
+    if (err?.name === "AbortError") {
+      throw new Error("Servidor demorou para responder. Verifique sua conexão e tente novamente.");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
   }
-  return res.json() as Promise<T>;
 }
 
 export const api = {
