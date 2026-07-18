@@ -10,6 +10,7 @@ import sponsorsRouter from "./sponsors";
 import galleryRouter from "./gallery";
 import certificatesRouter from "./certificates";
 import configRouter from "./config";
+import restoreRouter from "./restore";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(sponsorsRouter);
 router.use(galleryRouter);
 router.use(certificatesRouter);
 router.use(configRouter);
+router.use(restoreRouter);
 
 export default router;
