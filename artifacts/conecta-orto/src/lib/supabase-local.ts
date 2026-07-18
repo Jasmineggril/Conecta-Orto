@@ -3,7 +3,7 @@
  * Aponta para /api (roteado pelo proxy compartilhado do Replit).
  */
 
-const API_BASE = "/api";
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "") + "/api";
 
 type Row = Record<string, any>;
 
