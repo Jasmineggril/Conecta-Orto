@@ -1,16 +1,17 @@
 {
   "buildCommand": "NODE_ENV=production pnpm --filter @workspace/conecta-orto run build",
   "outputDirectory": "artifacts/conecta-orto/dist/public",
-  "installCommand": "pnpm install && npm --prefix api install",
+  "installCommand": "pnpm install",
   "headers": [
     {
       "source": "/(.*)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }]
     }
   ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/handler" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    {
+      "source": "/((?!assets|favicon|robots|videos|planta).*)",
+      "destination": "/index.html"
+    }
   ]
 }

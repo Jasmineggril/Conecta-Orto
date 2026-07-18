@@ -1,8 +1,0 @@
-{
-  "name": "conecta-orto-api",
-  "private": true,
-  "dependencies": {
-    "jsonwebtoken": "^9.0.3",
-    "pg": "^8.13.0"
-  }
-}

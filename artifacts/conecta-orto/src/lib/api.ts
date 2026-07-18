@@ -1,6 +1,7 @@
 /**
- * Minimal typed API client for direct REST calls to /api.
- * Used by admin components and all public pages.
+ * Typed API client.
+ * Em desenvolvimento local usa /api (proxy do Vite ou Replit dev).
+ * Em produção no Vercel usa VITE_API_BASE_URL que aponta para a API deployada.
  */
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "") + "/api";
@@ -16,7 +17,7 @@ function authHeaders(): Record<string, string> {
 
 async function request<T>(path: string, opts?: RequestInit): Promise<T> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000); // 12s timeout
+  const timeout = setTimeout(() => controller.abort(), 15000);
 
   try {
     const res = await fetch(`${API_BASE}${path}`, {
@@ -41,7 +42,7 @@ async function request<T>(path: string, opts?: RequestInit): Promise<T> {
     return res.json() as Promise<T>;
   } catch (err: any) {
     if (err?.name === "AbortError") {
-      throw new Error("Servidor demorou para responder. Verifique sua conexão e tente novamente.");
+      throw new Error("Servidor demorou para responder. Tente novamente.");
     }
     throw err;
   } finally {
@@ -50,8 +51,8 @@ async function request<T>(path: string, opts?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  get:    <T>(path: string)                    => request<T>(path),
-  post:   <T>(path: string, body: unknown)     => request<T>(path, { method: "POST",   body: JSON.stringify(body) }),
-  put:    <T>(path: string, body: unknown)     => request<T>(path, { method: "PUT",    body: JSON.stringify(body) }),
-  delete: <T>(path: string)                    => request<T>(path, { method: "DELETE" }),
+  get:    <T>(path: string)                => request<T>(path),
+  post:   <T>(path: string, body: unknown) => request<T>(path, { method: "POST",   body: JSON.stringify(body) }),
+  put:    <T>(path: string, body: unknown) => request<T>(path, { method: "PUT",    body: JSON.stringify(body) }),
+  delete: <T>(path: string)               => request<T>(path, { method: "DELETE" }),
 };
