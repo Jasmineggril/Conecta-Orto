@@ -3,16 +3,27 @@ const { Pool } = require("pg");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
-// ─── DB Pool ──────────────────────────────────────────────────────────────────
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL?.includes("localhost") ? false : { rejectUnauthorized: false },
-  max: 5,
-  idleTimeoutMillis: 30000,
-});
+// ─── DB ───────────────────────────────────────────────────────────────────────
+// Lazy pool — created once and reused across warm invocations
+let _pool = null;
+function getPool() {
+  if (!_pool) {
+    const connStr = process.env.DATABASE_URL;
+    if (!connStr) throw new Error("DATABASE_URL is not set");
+    _pool = new Pool({
+      connectionString: connStr,
+      ssl: connStr.includes("localhost") ? false : { rejectUnauthorized: false },
+      max: 3,
+      idleTimeoutMillis: 20000,
+      connectionTimeoutMillis: 10000,
+    });
+    _pool.on("error", (err) => console.error("[Pool error]", err.message));
+  }
+  return _pool;
+}
 
 async function query(sql, params = []) {
-  const client = await pool.connect();
+  const client = await getPool().connect();
   try {
     const result = await client.query(sql, params);
     return result.rows;
